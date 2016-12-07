@@ -5,47 +5,58 @@ use warnings;
 
 use Localization qw(lz);
 
+my $dtf = DateTimeFactory->new;
+
 sub _tokenize {
 	my ($text) = @_;
-	my %result = ();
 
 	my $regexp = lz("span_regexp");
 	if($text =~ m/${regexp}/g) {
+		my %result = ();
+
 		$result{day} = $1 // lz("today");
 		$result{preposition} = $2 // "";
-		$result{hour1} = $3 // 0;
-		$result{minute1} = $4 // 0;
-		$result{hour2} = $5 // 0;
-		$result{minute2} = $6 // 0;
-	}
+		$result{hours1} = $3 // 0;
+		$result{minutes1} = $4 // 0;
+		$result{hours2} = $5 // 0;
+		$result{minutes2} = $6 // 0;
 
-	\%result;
+		\%result;
+	} else {
+		undef;
+	}
 }
 
-sub parse_span {
-	my ($text) = @_;
+sub _parse_tokens {
+	my ($tokens, $begin) = @_;
 
-	my $regexp = lz("span_regexp");
-	if($text =~ m/${regexp}/g) {
-		my $day = $1 // lz("today");
-		my $from_hour = $2 // 0;
-		my $from_minute = $3 // 0;
-		my $to_hour = $4 // ($from_hour + 1);
-		my $to_minute = $5 // 0;
-		print "success/$day/$from_hour/$from_minute/$to_hour/$to_minute";
+	my $start = $begin->clone;
+	$start->truncate(to => "day");
+	$start->add(hours => $tokens->{hours1}, minutes => $tokens->{minutes1});
+
+	my $end = $begin->clone;
+	$end->truncate(to => "day");
+	$end->add(hours => $tokens->{hours2}, minutes => $tokens->{minutes2});
+
+	my $monday_re = lz("monday_re");
+	my $tuesday_re = lz("tuesday_re");
+	my $wednesday_re = lz("wednesday_re");
+	my $thursday_re = lz("thursday_re");
+	my $friday_re = lz("friday_re");
+	my $saturday_re = lz("saturday_re");
+	my $sunday_re = lz("sunday_re");
+
+	if ($tokens->{day} eq lz("tomorrow")) {
+		$start->add(days => 1);
+		$end->add(days => 1);
+	} elsif ($tokens->{day} =~ m/${monday_re}/g) {
 	}
 
-#	my $date = new Date::Manip::Date [
-#		"Language", lz("date_manip_language"),
-#		"DateFormat", lz("date_manip_format"),
-#		"YYtoYYYY", 0,
-#		"Format_MMMYYYY", "first",
-#	];
-#	$date->parse($text) ? undef : $self->epoch($date->printf("%s"));
-
-#	$self->span_se(
-#		$self->tomorrow->add(hours => 10),
-#		$self->tomorrow->add(hours => 12));
+	if ($dtf->cmp($start, $end) < 0) {
+		$dtf->span_se($start, $end);
+	} else {
+		undef;
+	}
 }
 
 1;
