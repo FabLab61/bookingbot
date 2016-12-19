@@ -25,6 +25,9 @@ my %strings = (
 		"saturday_re"                         => qr/sat(?:urday)?/i,
 		"sunday_re"                           => qr/sun(?:day)?/i,
 
+		"at_re"                               => qr/at/i,
+		"until_re"                            => qr/until/i,
+
 		"30_min"                              => "30 minutes",
 		"1_hour"                              => "1 hour",
 		"2_hours"                             => "2 hours",
@@ -77,6 +80,9 @@ my %strings = (
 		"friday_re"                           => qr/(?:пт)|(?:пятниц(?:а|у))/i,
 		"saturday_re"                         => qr/(?:сб)|(?:суббот(?:а|у))/i,
 		"sunday_re"                           => qr/(?:вс)|(?:воскресенье)/i,
+		
+		"at_re"                               => qr/в/i,
+		"until_re"                            => qr/до/i,
 
 		"30_min"                              => "30 минут",
 		"1_hour"                              => "1 час",

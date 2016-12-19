@@ -16,10 +16,10 @@ sub _tokenize {
 
 		$result{day} = $1 // lz("today");
 		$result{preposition} = $2 // "";
-		$result{hours1} = $3 // 0;
-		$result{minutes1} = $4 // 0;
-		$result{hours2} = $5 // 0;
-		$result{minutes2} = $6 // 0;
+		$result{hours1} = ($3 // 0) + 0;
+		$result{minutes1} = ($4 // 0) + 0;
+		$result{hours2} = ($5 // 0) + 0;
+		$result{minutes2} = ($6 // 0) + 0;
 
 		\%result;
 	} else {
@@ -28,28 +28,60 @@ sub _tokenize {
 }
 
 sub _parse_tokens {
-	my ($tokens, $begin) = @_;
+	my ($tokens, $begin, $workinghours) = @_;
 
 	my $start = $begin->clone;
-	$start->truncate(to => "day");
-	$start->add(hours => $tokens->{hours1}, minutes => $tokens->{minutes1});
-
 	my $end = $begin->clone;
-	$end->truncate(to => "day");
-	$end->add(hours => $tokens->{hours2}, minutes => $tokens->{minutes2});
 
-	my $monday_re = lz("monday_re");
-	my $tuesday_re = lz("tuesday_re");
-	my $wednesday_re = lz("wednesday_re");
-	my $thursday_re = lz("thursday_re");
-	my $friday_re = lz("friday_re");
-	my $saturday_re = lz("saturday_re");
-	my $sunday_re = lz("sunday_re");
+	$start->truncate(to => "day");
+	$end->truncate(to => "day");
+
+	my $at_re = lz("at_re");
+	my $until_re = lz("until_re");
+
+	if ($tokens->{preposition} =~ m/$at_re/g) {
+		$start->add(hours => $tokens->{hours1}, minutes => $tokens->{minutes1});
+		$end->add(hours => $tokens->{hours1} + 1, minutes => $tokens->{minutes1});
+	} elsif ($tokens->{preposition} =~ m/$until_re/g) {
+		$start = $workinghours->start->clone;
+		$end->add(hours => $tokens->{hours1}, minutes => $tokens->{minutes1});
+	} else {
+		$start->add(hours => $tokens->{hours1}, minutes => $tokens->{minutes1});
+
+		if ($tokens->{hours2} == 0 && $tokens->{minutes2} == 0) {
+			$end->add(days => 1);
+		} else {
+			$end->add(hours => $tokens->{hours2}, minutes => $tokens->{minutes2});
+		}
+	}
 
 	if ($tokens->{day} eq lz("tomorrow")) {
 		$start->add(days => 1);
 		$end->add(days => 1);
-	} elsif ($tokens->{day} =~ m/${monday_re}/g) {
+	} else {
+		my %days = (
+			lz("monday_re")    => 1,
+			lz("tuesday_re")   => 2,
+			lz("wednesday_re") => 3,
+			lz("thursday_re")  => 4,
+			lz("friday_re")    => 5,
+			lz("saturday_re")  => 6,
+			lz("sunday_re")    => 7
+		);
+
+		foreach my $re (keys %days) {
+			if ($tokens->{day} =~ m/$re/g) {
+				my $current = $start->day_of_week();
+				my $target = $days{$re};
+				my $delta = $target - $current + ($target < $current ? 7 : 0);
+
+				$start->add(days => $delta);
+				$end->add(days => $delta);
+
+				last;
+			}
+		}
+		
 	}
 
 	if ($dtf->cmp($start, $end) < 0) {
