@@ -28,7 +28,17 @@ sub exists {
 sub is_instructor {
 	my ($self, $id) = @_;
 	my @result = grep { $_->id eq $id } values %{$self->{instructors}};
-	scalar @result > 0;
+	scalar @result;
+}
+
+sub name {
+	my ($self, $id) = @_;
+
+	my @result = grep {
+		$self->{instructors}->{$_}->id eq $id;
+	} keys %{$self->{instructors}};
+
+	scalar @result ? $result[0] : undef;
 }
 
 sub share_contact {

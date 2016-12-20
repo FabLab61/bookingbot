@@ -36,6 +36,21 @@ sub vacancies {
 	$self->{resources}->{$name}->vacancies($duration, $span);
 }
 
+sub schedule {
+	my ($self, $instructor, $span) = @_;
+
+	my %result = ();
+	foreach my $name (keys %{$self->{resources}}) {
+		my $resource = $self->{resources}->{$name};
+		my $schedule = $resource->schedule($instructor, $span);
+		if (@$schedule) {
+			$result{$name} = $schedule;
+		}
+	}
+
+	\%result;
+}
+
 sub book {
 	my ($self, $summary, $name, $span) = @_;
 	$self->{resources}->{$name}->book($summary, $span);

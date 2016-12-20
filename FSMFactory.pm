@@ -82,6 +82,21 @@ sub instructor_fsm {
 		send_schedule => sub {
 			$self->{api}->send_message(
 				{chat_id => $chat_id, text => lz("instructor_schedule")});
+
+			my $instructor = $self->{instructors}->name($user->{id});
+			my $schedule = $self->{resources}->schedule($instructor);
+
+			my $text = "";
+			foreach my $resource (keys %$schedule) {
+				$text .= $resource . ":\n";
+				foreach my $event (@{$schedule->{$resource}}) {
+					$text .= dt($event->{span}->start) . " - ";
+					$text .= dt($event->{span}->end) . ": ";
+					$text .= ($event->{busy} ? lz("busy") : lz("free")) . "\n";
+				}
+			}
+
+			$self->{api}->send_message({chat_id => $chat_id, text => $text});
 		},
 
 		ask_record_time => sub {
@@ -151,10 +166,10 @@ sub user_fsm {
 			my $min = $self->{dtf}->dur(minutes => shift @durations);
 
 			my @keyboard = grep {
-				scalar @{$self->{resources}->vacancies($_, $min)} > 0;
+				scalar @{$self->{resources}->vacancies($_, $min)};
 			} @{$self->{resources}->names};
 
-			if (scalar @keyboard > 0) {
+			if (@keyboard) {
 				$self->{api}->send_keyboard({
 					chat_id => $chat_id,
 					text => lz("select_resource"),
@@ -194,10 +209,10 @@ sub user_fsm {
 						minutes => $durations->{$_});
 					my $vacancies = $self->{resources}->vacancies(
 						$resource, $duration);
-					scalar @$vacancies > 0;
+					scalar @$vacancies;
 				} keys %$durations;
 
-			if (scalar @keyboard > 0) {
+			if (@keyboard) {
 				$self->{api}->send_keyboard({
 					chat_id => $chat_id,
 					text => lz("select_duration"),
@@ -212,7 +227,7 @@ sub user_fsm {
 			my ($arg) = @_;
 			my $durations = $self->{durations};
 			my @result = grep { lz($_) eq $arg } keys %$durations;
-			scalar @result > 0
+			scalar @result
 				? $self->{dtf}->dur(minutes => $durations->{$result[0]})
 				: undef;
 		},
