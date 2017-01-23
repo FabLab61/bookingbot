@@ -96,6 +96,10 @@ sub instructor_fsm {
 				}
 			}
 
+			if ($text eq "") {
+				$text = lz("instructor_schedule_is_empty")
+			}
+
 			$self->{api}->send_message({chat_id => $chat_id, text => $text});
 		},
 
