@@ -4,6 +4,7 @@
 
 	"language": "Russian",
 	"timezone": "Europe/Moscow",
+	"workinghours": "08:00-00:00",
 
 	"resources": {
 		"Lasersaur": {

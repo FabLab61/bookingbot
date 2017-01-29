@@ -89,7 +89,7 @@ sub new {
 						});
 					},
 
-					DURATION => sub {
+					RECORD_DONE => sub {
 						my ($state, $update) = @_;
 						FSMUtils::_with_text($update, sub {
 							my ($text) = @_;
@@ -111,7 +111,7 @@ sub new {
 				rules => [RECORD => 1],
 			},
 
-			DURATION => {
+			RECORD_DONE => {
 				do => sub {
 					my ($state) = @_;
 					$state->message("transition");

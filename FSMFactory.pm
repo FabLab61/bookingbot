@@ -10,6 +10,7 @@ use InstructorFSM;
 use Instructors;
 use Localization qw(lz dt);
 use Resources;
+use RecordTimeParser;
 
 sub new {
 	my ($class, $api, $groups, $config) = @_;
@@ -19,6 +20,7 @@ sub new {
 	my $instructors = Instructors->new(
 		$api, $contacts, $groups, $config->{instructors});
 	my $resources = Resources->new($config->{resources});
+	my $recordtimeparser = RecordTimeParser->new($config->{workinghours});
 
 	my $self = {
 		api => $api,
@@ -26,6 +28,7 @@ sub new {
 		dtf => $dtf,
 		instructors => $instructors,
 		resources => $resources,
+		recordtimeparser => $recordtimeparser,
 		durations => $config->{durations},
 		log => Log->new("fsmfactory")
 
@@ -126,8 +129,7 @@ sub instructor_fsm {
 
 		parse_record_time => sub {
 			my ($text) = @_;
-			my $result;
-			$result;
+			$self->{recordtimeparser}->parse($text);
 		},
 	);
 }

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use lib "..";
 use DateTimeFactory;
@@ -150,28 +150,29 @@ my %data = (
 	}]
 );
 
-
-sub _parse_workinghours {
-	my ($workinghours, $begin) = @_;
-	if($workinghours =~ m/(\d{2}):(\d{2})-(\d{2}):(\d{2})/g) {
-		my $start = $begin->clone;
-		$start->truncate(to => "day");
-		$start->add(hours => $1 // 0, minutes => $2 // 0);
-
-		my $end = $begin->clone;
-		$end->truncate(to => "day");
-		$end->add(hours => $3 // 0, minutes => $4 // 0);
-
-
-		if ($dtf->cmp($start, $end) >= 0) {
-			$end->add(days => 1);
-		}
-
-		$dtf->span_se($start, $end);
-	} else {
-		undef;
-	}
+sub spanToISOString {
+	my ($span) = @_;
+	my $format = "%FT%R";
+	my $startstr = $span->start->strftime($format);
+	my $endstr = $span->end->strftime($format);
+	$startstr . "-" . $endstr;
 }
+
+subtest "_parse_workinghours" => sub {
+	my $today = DateTime->from_epoch(epoch => 0);
+	my $data = [{
+		"workinghours" => "08:00-00:00",
+		"span" => "1970-01-01T08:00-1970-01-02T00:00",
+	}, {
+		"workinghours" => "00:00-00:00",
+		"span" => "1970-01-01T00:00-1970-01-02T00:00",
+	}];
+	foreach my $record (@$data) {
+		my $span = RecordTimeParser::_parse_workinghours($record->{workinghours}, $today);
+		is(spanToISOString($span), $record->{span}, $record->{workinghours});
+	}
+};
+
 
 subtest "_tokenize (russian)" => sub {
 	Localization::set_language("Russian");
@@ -186,23 +187,19 @@ subtest "_tokenize (russian)" => sub {
 subtest "_parse_tokens (russian)" => sub {
 	Localization::set_language("Russian");
 
-	my $begin = DateTime->from_epoch(epoch => 0);
+	my $today = DateTime->from_epoch(epoch => 0);
 	my $russian = $data{russian};
 	foreach my $record (@$russian) {
 		my $tokens = RecordTimeParser::_tokenize($record->{input});
 
-		my $workinghours = _parse_workinghours(
-			$record->{workinghours}, $begin);
+		my $workinghours = RecordTimeParser::_parse_workinghours(
+			$record->{workinghours}, $today);
 
 		my $span = RecordTimeParser::_parse_tokens(
-			$tokens, $begin, $workinghours);
+			$tokens, $today, $workinghours);
 
 		if (defined $span) {
-			my $format = "%FT%R";
-			my $startstr = $span->start->strftime($format);
-			my $endstr = $span->end->strftime($format);
-			my $spanstr = $startstr . "-" . $endstr;
-			is_deeply($spanstr, $record->{span}, $record->{input});
+			is(spanToISOString($span), $record->{span}, $record->{input});
 		} else {
 			is(undef, $record->{span}, $record->{input});
 		}

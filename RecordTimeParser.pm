@@ -7,6 +7,29 @@ use Localization qw(lz);
 
 my $dtf = DateTimeFactory->new;
 
+sub _parse_workinghours {
+	my ($workinghours, $today) = @_;
+
+	if ($workinghours =~ m/(\d{2}):(\d{2})-(\d{2}):(\d{2})/g) {
+		my $start = $today->clone;
+		$start->truncate(to => "day");
+		$start->add(hours => $1 // 0, minutes => $2 // 0);
+
+		my $end = $today->clone;
+		$end->truncate(to => "day");
+		$end->add(hours => $3 // 0, minutes => $4 // 0);
+
+
+		if ($dtf->cmp($start, $end) >= 0) {
+			$end->add(days => 1);
+		}
+
+		$dtf->span_se($start, $end);
+	} else {
+		undef;
+	}
+}
+
 sub _tokenize {
 	my ($text) = @_;
 
@@ -28,10 +51,10 @@ sub _tokenize {
 }
 
 sub _parse_tokens {
-	my ($tokens, $begin, $workinghours) = @_;
+	my ($tokens, $today, $workinghours) = @_;
 
-	my $start = $begin->clone;
-	my $end = $begin->clone;
+	my $start = $today->clone;
+	my $end = $today->clone;
 
 	$start->truncate(to => "day");
 	$end->truncate(to => "day");
@@ -89,6 +112,22 @@ sub _parse_tokens {
 	} else {
 		undef;
 	}
+}
+
+sub new {
+	my ($class, $workinghours) = @_;
+	die unless defined $workinghours;
+
+	my $self = {workinghours => $workinghours};
+	bless $self, $class;
+}
+
+sub parse {
+	my ($self, $text) = @_;
+	my $tokens = _tokenize($text);
+	my $today = $dtf->now;
+	my $workinghours = _parse_workinghours($self->{workinghours}, $today);
+	_parse_tokens($tokens, $today, $workinghours);
 }
 
 1;
