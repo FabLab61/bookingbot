@@ -115,6 +115,11 @@ sub new {
 				do => sub {
 					my ($state) = @_;
 					$state->message("transition");
+
+					my $machine = $state->machine;
+					my $record = $machine->last_result("RECORD");
+
+					$callbacks{save_record}($record);
 				},
 				rules => [MENU => 1],
 			},

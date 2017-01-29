@@ -12,6 +12,8 @@ use Localization qw(lz dt);
 use Resources;
 use RecordTimeParser;
 
+use DumperUtils;
+
 sub new {
 	my ($class, $api, $groups, $config) = @_;
 
@@ -130,6 +132,13 @@ sub instructor_fsm {
 		parse_record_time => sub {
 			my ($text) = @_;
 			$self->{recordtimeparser}->parse($text);
+		},
+
+		save_record => sub {
+			my ($record) = @_;
+
+			$self->{api}->send_message({
+				chat_id => $chat_id, text => DumperUtils::span2str($record)});
 		},
 	);
 }
