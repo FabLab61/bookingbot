@@ -31,7 +31,7 @@ case $COMMAND in
 
 	prove)
 	build
-	docker run --rm --name bookingbot --entrypoint prove fablab/bookingbot
+	docker run --rm --name bookingbot --entrypoint prove fablab/bookingbot -l
 	;;
 
 	sh)

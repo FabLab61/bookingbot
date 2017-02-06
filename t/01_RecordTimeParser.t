@@ -4,7 +4,6 @@ use utf8;
 
 use Test::More tests => 3;
 
-use lib "..";
 use DateTimeFactory;
 use RecordTimeParser;
 
