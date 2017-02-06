@@ -26,6 +26,7 @@ Configuration file named `bot.json` and has following structure (comments separa
 
 	"language": "Russian",                 # Optional. Bot default language (supported values: English, Russian). English used if omitted.
 	"timezone": "Europe/Moscow",           # Bot time zone.
+	"workinghours": "08:00-00:00",         # Working hours of your organization in format HH:MM-HH-MM (24 hours).
 
 	"resources": {
 		"CTC 3D printer": {                # Human-readable name of resource.
