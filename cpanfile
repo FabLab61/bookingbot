@@ -15,5 +15,6 @@ requires "Log::Any::Adapter";
 requires "Log::Any::For::Std";
 requires "Mojolicious::Lite";
 requires "Scalar::Util";
+requires "TAP::Harness";
 requires "Try::Tiny";
 requires "WWW::Telegram::BotAPI";

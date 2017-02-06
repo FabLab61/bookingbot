@@ -11,10 +11,10 @@ function runwatch {
 	done
 }
 
-COMMAND=${1:-regular}
+COMMAND=${1:-run}
 
 case $COMMAND in
-	regular)
+	run)
 	build
 	docker run --rm --name bookingbot fablab/bookingbot bot.pl
 	;;
@@ -29,18 +29,25 @@ case $COMMAND in
 	docker run -it --rm --name bookingbot fablab/bookingbot -d bot.pl
 	;;
 
-	tests)
+	prove)
 	build
-	docker run --rm --name bookingbot fablab/bookingbot ./tests/RecordTimeParser.pl
+	docker run --rm --name bookingbot --entrypoint prove fablab/bookingbot
+	;;
+
+	sh)
+	build
+	docker run -it --rm --name bookingbot --entrypoint /bin/bash fablab/bookingbot
 	;;
 
 	*)
 	echo "Unknown command: $COMMAND" >&2
 	echo "Usage: $0 [command]" >&2
-	echo "	regular	run bot in regular mode (default)" >&2
-	echo "	watch	run bot in regular mode and restart it each time source files changed" >&2
-	echo "	debug	run bot with debugger attached" >&2
-	echo "	tests	run tests" >&2
+	echo "	run     run bot (default)" >&2
+	echo "	watch   run bot and restart it each time source files changed" >&2
+	echo "	debug   run bot with debugger attached" >&2
+	echo "	prove   run tests" >&2
+	echo "	sh      run a shell in the container" >&2
+	echo "	help    show this help and exit" >&2
 	exit 1
 	;;
 esac
