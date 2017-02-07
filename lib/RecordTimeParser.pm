@@ -53,6 +53,8 @@ sub _tokenize {
 sub _parse_tokens {
 	my ($tokens, $today, $workinghours) = @_;
 
+	die unless defined $tokens;
+
 	my $start = $today->clone;
 	my $end = $today->clone;
 
@@ -128,9 +130,13 @@ sub new {
 sub parse {
 	my ($self, $text) = @_;
 	my $tokens = _tokenize($text);
-	my $today = $self->{dtf}->now;
-	my $workinghours = _parse_workinghours($self->{workinghours}, $today);
-	_parse_tokens($tokens, $today, $workinghours);
+	if (defined $tokens) {
+		my $today = $self->{dtf}->now;
+		my $workinghours = _parse_workinghours($self->{workinghours}, $today);
+		_parse_tokens($tokens, $today, $workinghours);
+	} else {
+		undef;
+	}
 }
 
 1;

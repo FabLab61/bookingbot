@@ -132,6 +132,11 @@ my %data = (
 		"workinghours" => "08:00-00:00",
 		"span" => "1970-01-05T10:30-1970-01-05T11:30",
 	}, {
+		"input" => "завтра",
+		"tokens" => undef,
+		"workinghours" => "08:00-00:00",
+		"span" => undef,
+	}, {
 		"input" => "во вторник с 15 до 13",
 		"tokens" => {
 			day			=> "вторник",
@@ -188,17 +193,18 @@ subtest "_parse_tokens (russian)" => sub {
 	my $russian = $data{russian};
 	foreach my $record (@$russian) {
 		my $tokens = RecordTimeParser::_tokenize($record->{input});
+		if (defined $tokens) {
+			my $workinghours = RecordTimeParser::_parse_workinghours(
+				$record->{workinghours}, $today);
 
-		my $workinghours = RecordTimeParser::_parse_workinghours(
-			$record->{workinghours}, $today);
+			my $span = RecordTimeParser::_parse_tokens(
+				$tokens, $today, $workinghours);
 
-		my $span = RecordTimeParser::_parse_tokens(
-			$tokens, $today, $workinghours);
-
-		if (defined $span) {
-			is(spanToISOString($span), $record->{span}, $record->{input});
-		} else {
-			is(undef, $record->{span}, $record->{input});
+			if (defined $span) {
+				is(spanToISOString($span), $record->{span}, $record->{input});
+			} else {
+				is(undef, $record->{span}, $record->{input});
+			}
 		}
 	}
 };
