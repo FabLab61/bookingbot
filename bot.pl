@@ -6,6 +6,8 @@ use common::sense;
 use File::Basename qw(dirname);
 use Mojolicious::Lite;
 
+use lib "lib/";
+
 use FSMFactory;
 use Google;
 use Groups;
