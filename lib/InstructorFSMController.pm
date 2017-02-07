@@ -40,14 +40,17 @@ sub _send_keyboard {
 }
 
 sub send_start_message {
+	my ($self) = @_;
 	$self->_send_message(lz("instructor_start"));
 }
 
 sub send_cancel_message {
+	my ($self) = @_;
 	$self->_send_message(lz("instructor_operation_cancelled"));
 }
 
 sub send_menu {
+	my ($self) = @_;
 	my @keyboard = (
 		lz("instructor_show_schedule"),
 		lz("instructor_add_record"),
@@ -56,19 +59,20 @@ sub send_menu {
 }
 
 sub is_schedule_selected {
-	my ($text) = @_;
+	my ($self, $text) = @_;
 	$text eq lz("instructor_show_schedule");
 }
 
 sub is_add_record_selected {
-	my ($text) = @_;
+	my ($self, $text) = @_;
 	$text eq lz("instructor_add_record");
 }
 
 sub send_schedule {
+	my ($self) = @_;
 	$self->_send_message(lz("instructor_schedule"));
 
-	my $instructor = $self->{instructors}->name($api->{user}->{id});
+	my $instructor = $self->{instructors}->name($self->{user}->{id});
 	my $schedule = $self->{resources}->schedule($instructor);
 
 	my $text = "";
@@ -89,6 +93,7 @@ sub send_schedule {
 }
 
 sub ask_record_time {
+	my ($self) = @_;
 	my @keyboard = (
 		lz("instructor_cancel_operation"),
 	);
@@ -96,21 +101,22 @@ sub ask_record_time {
 }
 
 sub is_cancel_operation_selected {
-	my ($text) = @_;
+	my ($self, $text) = @_;
 	$text eq lz("instructor_cancel_operation");
 }
 
 sub ask_record_time_failed {
+	my ($self) = @_;
 	$self->_send_message(lz("invalid_record_time"));
 }
 
 sub parse_record_time {
-	my ($text) = @_;
+	my ($self, $text) = @_;
 	$self->{recordtimeparser}->parse($text);
 }
 
 sub save_record {
-	my ($record) = @_;
+	my ($self, $record) = @_;
 	$self->_send_message(DumperUtils::span2str($record));
 }
 
