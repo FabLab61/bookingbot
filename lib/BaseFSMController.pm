@@ -15,6 +15,11 @@ sub new {
 	bless $self, $class;
 }
 
+sub transition {
+	my ($self, $state) = @_;
+	$state->message("transition");
+}
+
 sub send_message {
 	my ($self, $text) = @_;
 	$self->{api}->send_message({

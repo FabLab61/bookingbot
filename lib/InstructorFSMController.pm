@@ -5,12 +5,16 @@ use warnings;
 
 use Localization qw(lz dt);
 
-use DumperUtils;
+use FSMUtils;
+
+use DumperUtils; # TODO: remove
 
 use parent ("BaseFSMController");
 
 sub new {
-	my ($class, $user, $chat_id, $api, $instructors, $resources, $recordtimeparser) = @_;
+	my ($class, $user,
+		$chat_id, $api,
+		$instructors, $resources, $recordtimeparser) = @_;
 
 	my $self = $class->SUPER::new($chat_id, $api);
 	$self->{user} = $user;
@@ -22,18 +26,38 @@ sub new {
 	$self;
 }
 
-sub send_start_message {
-	my ($self) = @_;
+sub _rule_cancel {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub {
+		my ($text) = @_;
+		$text eq lz("instructor_cancel_operation");
+	});
+}
+
+################################################################################
+# START
+
+sub do_start {
+	my ($self, $state) = @_;
+	$self->transition($state);
 	$self->send_message(lz("instructor_start"));
 }
 
-sub send_cancel_message {
-	my ($self) = @_;
+################################################################################
+# CANCEL
+
+sub do_cancel {
+	my ($self, $state) = @_;
+	$self->transition($state);
 	$self->send_message(lz("instructor_operation_cancelled"));
 }
 
-sub send_menu {
-	my ($self) = @_;
+################################################################################
+# MENU
+
+sub do_menu {
+	my ($self, $state) = @_;
+	$self->transition($state);
 	my @keyboard = (
 		lz("instructor_show_schedule"),
 		lz("instructor_add_record"),
@@ -41,18 +65,22 @@ sub send_menu {
 	$self->send_keyboard(lz("instructor_menu"), \@keyboard);
 }
 
-sub is_schedule_selected {
-	my ($self, $text) = @_;
-	$text eq lz("instructor_show_schedule");
+sub silent_menu_rule_schedule {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub { shift eq lz("instructor_show_schedule"); });
 }
 
-sub is_add_record_selected {
-	my ($self, $text) = @_;
-	$text eq lz("instructor_add_record");
+sub silent_menu_rule_resource {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub { shift eq lz("instructor_add_record"); });
 }
 
-sub send_schedule {
-	my ($self) = @_;
+################################################################################
+# SCHEDULE
+
+sub do_schedule {
+	my ($self, $state) = @_;
+	$self->transition($state);
 	$self->send_message(lz("instructor_schedule"));
 
 	my $instructor = $self->{instructors}->name($self->{user}->{id});
@@ -75,59 +103,109 @@ sub send_schedule {
 	$self->send_message($text);
 }
 
-sub is_cancel_operation_selected {
-	my ($self, $text) = @_;
-	$text eq lz("instructor_cancel_operation");
-}
+################################################################################
+# RESOURCE
 
-sub send_resources {
-	my ($self) = @_;
+sub do_resource {
+	my ($self, $state) = @_;
 	my @keyboard = @{$self->{resources}->names};
 	if (@keyboard) {
 		push @keyboard, lz("instructor_cancel_operation");
 		$self->send_keyboard(lz("instructor_select_resource"), \@keyboard);
+		$state->result(1);
 	} else {
-		undef;
+		$self->transition($state);
+		$state->result(undef);
 	}
 }
 
-sub send_resource_not_found {
-	my ($self) = @_;
+sub resource_rule_resource_not_found {
+	my ($self, $state) = @_;
+	not defined $state->result;
+}
+
+sub resource_rule_time {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub {
+		FSMUtils::_parse_value($state, sub {
+			my ($name) = @_;
+			$self->{resources}->exists($name) ? $name : undef;
+		}, shift);
+	});
+}
+
+sub resource_rule_cancel {
+	my ($self, $state, $update) = @_;
+	$self->_rule_cancel($state, $update);
+}
+
+################################################################################
+# RESOURCE_NOT_FOUND
+
+sub do_resource_not_found {
+	my ($self, $state) = @_;
+	$self->transition($state);
 	$self->send_message(lz("instructor_resource_not_found"));
 }
 
-sub parse_resource {
-	my ($self, $name) = @_;
-	$self->{resources}->exists($name) ? $name : undef;
-}
+################################################################################
+# RESOURCE_FAILED
 
-sub send_resource_failed {
-	my ($self) = @_;
+sub do_resource_failed {
+	my ($self, $state) = @_;
+	$self->transition($state);
 	$self->send_message(lz("invalid_resource"));
 }
 
-sub send_time_request {
-	my ($self) = @_;
+################################################################################
+# TIME
+
+sub do_time {
+	my ($self, $state) = @_;
 	my @keyboard = (
 		lz("instructor_cancel_operation"),
 	);
 	$self->send_keyboard(lz("instructor_time"), \@keyboard);
 }
 
-sub send_time_failed {
-	my ($self) = @_;
+sub time_rule_cancel {
+	my ($self, $state, $update) = @_;
+	$self->_rule_cancel($state, $update);
+}
+
+sub time_rule_record {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub {
+		FSMUtils::_parse_value($state, sub {
+			$self->{recordtimeparser}->parse(shift);
+		}, shift);
+	});
+}
+
+################################################################################
+# TIME_FAILED
+
+sub do_time_failed {
+	my ($self, $state) = @_;
+	$self->transition($state);
 	$self->send_message(lz("invalid_time"));
 }
 
-sub parse_record_time {
-	my ($self, $text) = @_;
-	$self->{recordtimeparser}->parse($text);
-}
+################################################################################
+# RECORD
 
-sub save_record {
-	my ($self, $resource, $time) = @_;
+sub do_record {
+	my ($self, $state) = @_;
+	$self->transition($state);
+
+	my $machine = $state->machine;
+	my $resource = $machine->last_result("RESOURCE");
+	my $time = $machine->last_result("TIME");
+
 	$self->send_message($resource);
 	$self->send_message(DumperUtils::span2str($time));
 }
+
+################################################################################
 
 1;

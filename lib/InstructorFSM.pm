@@ -10,55 +10,29 @@ use FSMUtils;
 use parent ("BaseFSM");
 
 sub new {
-	my ($class, $controller) = @_;
+	my ($class, $ctrl) = @_;
 
 	my $self = {
 		fsa => FSA::Rules->new(
 			START => {
-				# init machine here
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_start_message();
-				},
+				do => sub { $ctrl->do_start(@_); },
 				rules => [MENU => 1],
 			},
 
 			CANCEL => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_cancel_message();
-				},
+				do => sub { $ctrl->do_cancel(@_); },
 				rules => [MENU => 1],
 			},
 
 			MENU => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_menu();
-				},
+				do => sub { $ctrl->do_menu(@_); },
 				rules => [SILENT_MENU => 1],
 			},
 
 			SILENT_MENU => {
 				rules => [
-					SCHEDULE => sub {
-						my ($state, $update) = @_;
-						FSMUtils::_with_text($update, sub {
-							my ($text) = @_;
-							$controller->is_schedule_selected($text);
-						});
-					},
-
-					RESOURCE => sub {
-						my ($state, $update) = @_;
-						FSMUtils::_with_text($update, sub {
-							my ($text) = @_;
-							$controller->is_add_record_selected($text);
-						});
-					},
+					SCHEDULE => sub { $ctrl->silent_menu_rule_schedule(@_); },
+					RESOURCE => sub { $ctrl->silent_menu_rule_resource(@_); },
 
 					MENU => \&FSMUtils::_start,
 
@@ -67,119 +41,49 @@ sub new {
 			},
 
 			SCHEDULE => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_schedule();
-				},
+				do => sub { $ctrl->do_schedule(@_); },
 				rules => [MENU => 1],
 			},
 
 			RESOURCE => {
-				do => sub {
-					my ($state) = @_;
-					if (not defined $controller->send_resources()) {
-						$state->message("transition");
-						$state->result(undef);
-					} else {
-						$state->result(1);
-					}
-				},
+				do => sub { $ctrl->do_resource(@_); },
 				rules => [
-					RESOURCE_NOT_FOUND => sub {
-						my ($state) = @_;
-						not defined $state->result;
-					},
-
-					TIME => sub {
-						my ($state, $update) = @_;
-						FSMUtils::_with_text($update, sub {
-							my ($text) = @_;
-							FSMUtils::_parse_value($state,
-								sub { $controller->parse_resource(@_); },
-								$text);
-						});
-					},
+					RESOURCE_NOT_FOUND => sub { $ctrl->resource_rule_resource_not_found(@_); },
+					TIME => sub { $ctrl->resource_rule_time(@_); },
 
 					CANCEL => \&FSMUtils::_start,
-					CANCEL => sub {
-						my ($state, $update) = @_;
-						FSMUtils::_with_text($update, sub {
-							my ($text) = @_;
-							$controller->is_cancel_operation_selected($text);
-						});
-					},
+					CANCEL => sub { $ctrl->resource_rule_cancel(@_); },
 
 					RESOURCE_FAILED => 1
 				],
 			},
 
 			RESOURCE_NOT_FOUND => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_resource_not_found();
-				},
+				do => sub { $ctrl->do_resource_not_found(@_); },
 				rules => [MENU => 1],
 			},
 
 			RESOURCE_FAILED => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_resource_failed();
-				},
+				do => sub { $ctrl->do_resource_failed(@_); },
 				rules => [RESOURCE => 1],
 			},
 
 			TIME => {
-				do => sub {
-					my ($state) = @_;
-					$controller->send_time_request();
-				},
+				do => sub { $ctrl->do_time(@_); },
 				rules => [
-					CANCEL => sub {
-						my ($state, $update) = @_;
-						FSMUtils::_with_text($update, sub {
-							my ($text) = @_;
-							$controller->is_cancel_operation_selected($text);
-						});
-					},
-
-					RECORD => sub {
-						my ($state, $update) = @_;
-						FSMUtils::_with_text($update, sub {
-							my ($text) = @_;
-							FSMUtils::_parse_value($state,
-								sub { $controller->parse_record_time(@_); },
-								$text);
-						});
-					},
-
+					CANCEL => sub { $ctrl->time_rule_cancel(@_); },
+					RECORD => sub { $ctrl->time_rule_record(@_); },
 					TIME_FAILED => 1
 				],
 			},
 
 			TIME_FAILED => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_time_failed();
-				},
+				do => sub { $ctrl->do_time_failed(@_); },
 				rules => [TIME => 1],
 			},
 
 			RECORD => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-
-					my $machine = $state->machine;
-					my $resource = $machine->last_result("RESOURCE");
-					my $time = $machine->last_result("TIME");
-
-					$controller->save_record($resource, $time);
-				},
+				do => sub { $ctrl->do_record(@_); },
 				rules => [MENU => 1],
 			},
 		)
