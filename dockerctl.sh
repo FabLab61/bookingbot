@@ -7,7 +7,7 @@ function build {
 function runwatch {
 	while inotifywait -e attrib ./*.p? ./tests/*.p?; do
 		docker stop bookingbot &> /dev/null
-		./docker_build_and_run.sh &
+		./dockerctl.sh &
 	done
 }
 
