@@ -81,7 +81,7 @@ sub new {
 						FSMUtils::_with_text($update, sub {
 							my ($text) = @_;
 							FSMUtils::_parse_value($state,
-								$controller->parse_resource, $text);
+								$controller->get_resource_parser(), $text);
 						});
 					},
 

@@ -83,9 +83,14 @@ sub send_resources {
 	}
 }
 
-sub parse_resource {
+sub _parse_resource {
 	my ($self, $name) = @_;
 	$self->{resources}->exists($name) ? $name : undef;
+}
+
+sub get_resource_parser {
+	my ($self) = @_;
+	$self->_parse_resource;
 }
 
 sub send_resource_not_found {
