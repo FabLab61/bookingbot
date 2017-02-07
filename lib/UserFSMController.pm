@@ -5,49 +5,30 @@ use warnings;
 
 use Localization qw(lz dt);
 
+use parent ("BaseFSMController");
+
 sub new {
 	my ($class, $user, $chat_id, $api, $contacts, $durations, $instructors, $resources) = @_;
-	my $self = {
-		user => $user,
-		chat_id => $chat_id,
 
-		api => $api,
-		contacts => $contacts,
-		durations => $durations,
-		instructors => $instructors,
-		resources => $resources,
+	my $self = $class->SUPER::new($chat_id, $api);
+	$self->{user} = $user;
+	$self->{contacts} = $contacts;
+	$self->{durations} = $durations;
+	$self->{instructors} = $instructors;
+	$self->{resources} = $resources;
+	$self->{log} = Log->new("userfsmcontroller");
 
-		dtf => DateTimeFactory->new,
-		log => Log->new("userfsmcontroller"),
-	};
-	bless $self, $class;
-}
-
-sub _send_message {
-	my ($self, $text) = @_;
-	$self->{api}->send_message({
-		chat_id => $self->{chat_id},
-		text => $text
-	});
-}
-
-sub _send_keyboard {
-	my ($self, $text, $keyboard) = @_;
-	$self->{api}->send_keyboard({
-		chat_id => $self->{chat_id},
-		text => $text,
-		keyboard => $keyboard
-	});
+	$self;
 }
 
 sub send_start_message {
 	my ($self) = @_;
-	$self->_send_message(lz("start"));
+	$self->send_message(lz("start"));
 }
 
 sub send_contact_message {
 	my ($self) = @_;
-	$self->_send_message(lz("contact"));
+	$self->send_message(lz("contact"));
 }
 
 sub save_contact {
@@ -60,12 +41,12 @@ sub save_contact {
 
 sub send_contact_failed {
 	my ($self) = @_;
-	$self->_send_message(lz("invalid_contact"));
+	$self->send_message(lz("invalid_contact"));
 }
 
 sub send_begin_message {
 	my ($self) = @_;
-	$self->_send_message(lz("begin"));
+	$self->send_message(lz("begin"));
 }
 
 sub send_resources {
@@ -79,7 +60,7 @@ sub send_resources {
 	} @{$self->{resources}->names};
 
 	if (@keyboard) {
-		$self->_send_keyboard(lz("select_resource"), \@keyboard);
+		$self->send_keyboard(lz("select_resource"), \@keyboard);
 	} else {
 		undef;
 	}
@@ -97,12 +78,12 @@ sub get_resource_parser {
 
 sub send_resource_not_found {
 	my ($self) = @_;
-	$self->_send_message(lz("resource_not_found"));
+	$self->send_message(lz("resource_not_found"));
 }
 
 sub send_resource_failed {
 	my ($self) = @_;
-	$self->_send_message(lz("invalid_resource"));
+	$self->send_message(lz("invalid_resource"));
 }
 
 sub send_durations {
@@ -143,12 +124,12 @@ sub parse_duration {
 
 sub send_duration_not_found {
 	my ($self) = @_;
-	$self->_send_message(lz("duration_not_found"));
+	$self->send_message(lz("duration_not_found"));
 }
 
 sub send_duration_failed {
 	my ($self) = @_;
-	$self->_send_message(lz("invalid_duration"));
+	$self->send_message(lz("invalid_duration"));
 }
 
 sub send_datetime_selector {
@@ -171,7 +152,7 @@ sub parse_datetime {
 
 sub send_datetime_failed {
 	my ($self) = @_;
-	$self->_send_message(lz("invalid_datetime"));
+	$self->send_message(lz("invalid_datetime"));
 }
 
 sub parse_instructor {
@@ -189,7 +170,7 @@ sub parse_instructor {
 
 sub send_instructor_failed {
 	my ($self) = @_;
-	$self->_send_message(lz("instructor_not_found"));
+	$self->send_message(lz("instructor_not_found"));
 }
 
 sub book {
@@ -200,7 +181,7 @@ sub book {
 		lz("booked_by", $self->{contacts}->fullname($self->{user}->{id})),
 		$resource, $span);
 
-	$self->_send_message(lz("booked", $resource, dt($datetime)));
+	$self->send_message(lz("booked", $resource, dt($datetime)));
 
 	if ($self->{instructors}->exists($instructor)) {
 		$self->{instructors}->share_contact($instructor, $self->{chat_id});
@@ -213,7 +194,7 @@ sub book {
 
 sub send_refresh {
 	my ($self) = @_;
-	$self->_send_keyboard(lz("press_refresh_button"), [lz("refresh")]);
+	$self->send_keyboard(lz("press_refresh_button"), [lz("refresh")]);
 }
 
 1;
