@@ -75,22 +75,48 @@ sub send_schedule {
 	$self->send_message($text);
 }
 
-sub ask_record_time {
-	my ($self) = @_;
-	my @keyboard = (
-		lz("instructor_cancel_operation"),
-	);
-	$self->send_keyboard(lz("instructor_record_time"), \@keyboard);
-}
-
 sub is_cancel_operation_selected {
 	my ($self, $text) = @_;
 	$text eq lz("instructor_cancel_operation");
 }
 
-sub ask_record_time_failed {
+sub send_resources {
 	my ($self) = @_;
-	$self->send_message(lz("invalid_record_time"));
+	my @keyboard = @{$self->{resources}->names};
+	if (@keyboard) {
+		push @keyboard, lz("instructor_cancel_operation");
+		$self->send_keyboard(lz("instructor_select_resource"), \@keyboard);
+	} else {
+		undef;
+	}
+}
+
+sub send_resource_not_found {
+	my ($self) = @_;
+	$self->send_message(lz("instructor_resource_not_found"));
+}
+
+sub parse_resource {
+	my ($self, $name) = @_;
+	$self->{resources}->exists($name) ? $name : undef;
+}
+
+sub send_resource_failed {
+	my ($self) = @_;
+	$self->send_message(lz("invalid_resource"));
+}
+
+sub send_time_request {
+	my ($self) = @_;
+	my @keyboard = (
+		lz("instructor_cancel_operation"),
+	);
+	$self->send_keyboard(lz("instructor_time"), \@keyboard);
+}
+
+sub send_time_failed {
+	my ($self) = @_;
+	$self->send_message(lz("invalid_time"));
 }
 
 sub parse_record_time {
@@ -99,8 +125,9 @@ sub parse_record_time {
 }
 
 sub save_record {
-	my ($self, $record) = @_;
-	$self->send_message(DumperUtils::span2str($record));
+	my ($self, $resource, $time) = @_;
+	$self->send_message($resource);
+	$self->send_message(DumperUtils::span2str($time));
 }
 
 1;

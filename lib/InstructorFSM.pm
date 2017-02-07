@@ -52,7 +52,7 @@ sub new {
 						});
 					},
 
-					RECORD => sub {
+					RESOURCE => sub {
 						my ($state, $update) = @_;
 						FSMUtils::_with_text($update, sub {
 							my ($text) = @_;
@@ -75,10 +75,67 @@ sub new {
 				rules => [MENU => 1],
 			},
 
-			RECORD => {
+			RESOURCE => {
 				do => sub {
 					my ($state) = @_;
-					$controller->ask_record_time();
+					if (not defined $controller->send_resources()) {
+						$state->message("transition");
+						$state->result(undef);
+					} else {
+						$state->result(1);
+					}
+				},
+				rules => [
+					RESOURCE_NOT_FOUND => sub {
+						my ($state) = @_;
+						not defined $state->result;
+					},
+
+					TIME => sub {
+						my ($state, $update) = @_;
+						FSMUtils::_with_text($update, sub {
+							my ($text) = @_;
+							FSMUtils::_parse_value($state,
+								sub { $controller->parse_resource(@_); },
+								$text);
+						});
+					},
+
+					CANCEL => \&FSMUtils::_start,
+					CANCEL => sub {
+						my ($state, $update) = @_;
+						FSMUtils::_with_text($update, sub {
+							my ($text) = @_;
+							$controller->is_cancel_operation_selected($text);
+						});
+					},
+
+					RESOURCE_FAILED => 1
+				],
+			},
+
+			RESOURCE_NOT_FOUND => {
+				do => sub {
+					my ($state) = @_;
+					$state->message("transition");
+					$controller->send_resource_not_found();
+				},
+				rules => [MENU => 1],
+			},
+
+			RESOURCE_FAILED => {
+				do => sub {
+					my ($state) = @_;
+					$state->message("transition");
+					$controller->send_resource_failed();
+				},
+				rules => [RESOURCE => 1],
+			},
+
+			TIME => {
+				do => sub {
+					my ($state) = @_;
+					$controller->send_time_request();
 				},
 				rules => [
 					CANCEL => sub {
@@ -89,38 +146,39 @@ sub new {
 						});
 					},
 
-					RECORD_DONE => sub {
+					RECORD => sub {
 						my ($state, $update) = @_;
 						FSMUtils::_with_text($update, sub {
 							my ($text) = @_;
-							FSMUtils::_parse_value( $state,
+							FSMUtils::_parse_value($state,
 								sub { $controller->parse_record_time(@_); },
 								$text);
 						});
 					},
 
-					RECORD_FAILED => 1
+					TIME_FAILED => 1
 				],
 			},
 
-			RECORD_FAILED => {
+			TIME_FAILED => {
 				do => sub {
 					my ($state) = @_;
 					$state->message("transition");
-					$controller->ask_record_time_failed();
+					$controller->send_time_failed();
 				},
-				rules => [RECORD => 1],
+				rules => [TIME => 1],
 			},
 
-			RECORD_DONE => {
+			RECORD => {
 				do => sub {
 					my ($state) = @_;
 					$state->message("transition");
 
 					my $machine = $state->machine;
-					my $record = $machine->last_result("RECORD");
+					my $resource = $machine->last_result("RESOURCE");
+					my $time = $machine->last_result("TIME");
 
-					$controller->save_record($record);
+					$controller->save_record($resource, $time);
 				},
 				rules => [MENU => 1],
 			},
