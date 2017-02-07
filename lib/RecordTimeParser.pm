@@ -118,14 +118,17 @@ sub new {
 	my ($class, $workinghours) = @_;
 	die unless defined $workinghours;
 
-	my $self = {workinghours => $workinghours};
+	my $self = {
+		workinghours => $workinghours,
+		dtf => DateTimeFactory->new
+	};
 	bless $self, $class;
 }
 
 sub parse {
 	my ($self, $text) = @_;
 	my $tokens = _tokenize($text);
-	my $today = $dtf->now;
+	my $today = $self->{dtf}->now;
 	my $workinghours = _parse_workinghours($self->{workinghours}, $today);
 	_parse_tokens($tokens, $today, $workinghours);
 }

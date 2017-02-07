@@ -3,6 +3,8 @@ package InstructorFSMController;
 use strict;
 use warnings;
 
+use Localization qw(lz dt);
+
 use DumperUtils;
 
 sub new {

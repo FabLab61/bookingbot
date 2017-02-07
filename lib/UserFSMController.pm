@@ -3,6 +3,8 @@ package UserFSMController;
 use strict;
 use warnings;
 
+use Localization qw(lz dt);
+
 sub new {
 	my ($class, $user, $chat_id, $api, $contacts, $durations, $instructors, $resources) = @_;
 	my $self = {

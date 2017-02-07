@@ -13,8 +13,6 @@ binmode $builder->output,         ":encoding(utf8)";
 binmode $builder->failure_output, ":encoding(utf8)";
 binmode $builder->todo_output,    ":encoding(utf8)";
 
-my $dtf = DateTimeFactory->new("UTC");
-
 my %data = (
 	"russian" => [{
 		"input" => "сегодня с 10:00 до 12:30",

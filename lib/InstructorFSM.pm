@@ -10,7 +10,7 @@ use FSMUtils;
 use parent ("BaseFSM");
 
 sub new {
-	my ($class, %callbacks) = @_;
+	my ($class, $controller) = @_;
 
 	my $self = {
 		fsa => FSA::Rules->new(
@@ -19,7 +19,7 @@ sub new {
 				do => sub {
 					my ($state) = @_;
 					$state->message("transition");
-					$callbacks{send_start_message}();
+					$controller->send_start_message();
 				},
 				rules => [MENU => 1],
 			},
@@ -28,7 +28,7 @@ sub new {
 				do => sub {
 					my ($state) = @_;
 					$state->message("transition");
-					$callbacks{send_cancel_message}();
+					$controller->send_cancel_message();
 				},
 				rules => [MENU => 1],
 			},
@@ -37,7 +37,7 @@ sub new {
 				do => sub {
 					my ($state) = @_;
 					$state->message("transition");
-					$callbacks{send_menu}();
+					$controller->send_menu();
 				},
 				rules => [SILENT_MENU => 1],
 			},
@@ -48,7 +48,7 @@ sub new {
 						my ($state, $update) = @_;
 						FSMUtils::_with_text($update, sub {
 							my ($text) = @_;
-							$callbacks{is_schedule_selected}($text);
+							$controller->is_schedule_selected($text);
 						});
 					},
 
@@ -56,7 +56,7 @@ sub new {
 						my ($state, $update) = @_;
 						FSMUtils::_with_text($update, sub {
 							my ($text) = @_;
-							$callbacks{is_add_record_selected}($text);
+							$controller->is_add_record_selected($text);
 						});
 					},
 
@@ -70,7 +70,7 @@ sub new {
 				do => sub {
 					my ($state) = @_;
 					$state->message("transition");
-					$callbacks{send_schedule}();
+					$controller->send_schedule();
 				},
 				rules => [MENU => 1],
 			},
@@ -78,14 +78,14 @@ sub new {
 			RECORD => {
 				do => sub {
 					my ($state) = @_;
-					$callbacks{ask_record_time}();
+					$controller->ask_record_time();
 				},
 				rules => [
 					CANCEL => sub {
 						my ($state, $update) = @_;
 						FSMUtils::_with_text($update, sub {
 							my ($text) = @_;
-							$callbacks{is_cancel_operation_selected}($text);
+							$controller->is_cancel_operation_selected($text);
 						});
 					},
 
@@ -93,8 +93,9 @@ sub new {
 						my ($state, $update) = @_;
 						FSMUtils::_with_text($update, sub {
 							my ($text) = @_;
-							FSMUtils::_parse_value($state,
-								$callbacks{parse_record_time}, $text);
+							FSMUtils::_parse_value( $state,
+								sub { $controller->parse_record_time(@_); },
+								$text);
 						});
 					},
 
@@ -106,7 +107,7 @@ sub new {
 				do => sub {
 					my ($state) = @_;
 					$state->message("transition");
-					$callbacks{ask_record_time_failed}();
+					$controller->ask_record_time_failed();
 				},
 				rules => [RECORD => 1],
 			},
@@ -119,7 +120,7 @@ sub new {
 					my $machine = $state->machine;
 					my $record = $machine->last_result("RECORD");
 
-					$callbacks{save_record}($record);
+					$controller->save_record($record);
 				},
 				rules => [MENU => 1],
 			},
