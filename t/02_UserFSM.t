@@ -6,6 +6,17 @@ use Test::More tests => 1;
 use Test::MockObject;
 use UserFSM;
 
+sub _calls_ok {
+	my ($fsm, $nextarg, $mock, $calls) = @_;
+
+	$mock->clear();
+	$fsm->next($nextarg);
+
+	for(my $i = 0; $i < scalar @$calls; $i++) {
+		$mock->called_pos_ok($i + 1, $calls->[$i]);
+	}
+}
+
 subtest "UserFSM" => sub {
 	my $mock = Test::MockObject->new();
 	$mock->set_false(
@@ -19,36 +30,29 @@ subtest "UserFSM" => sub {
 	my $fsm = UserFSM->new($mock);
 	$mock->called_ok("send_start_message");
 
-	$mock->clear();
-	$fsm->next();
-	$mock->called_ok("send_contact_message");
+	_calls_ok($fsm, undef, $mock, ["send_contact_message"]);
 
-	$mock->clear();
-	$fsm->next();
-	$mock->called_ok("send_contact_failed");
-	$mock->called_ok("send_contact_message");
+	_calls_ok($fsm, undef, $mock, [
+			"send_contact_failed",
+			"send_contact_message"]);
 
-	$mock->clear();
-	$fsm->next({ message => { text => "/start" }});
-	$mock->called_ok("send_start_message");
-	$mock->called_ok("send_contact_message");
+	_calls_ok($fsm, { message => { text => "/start" }}, $mock, [
+			"send_start_message",
+			"send_contact_message"]);
 
-	$mock->clear();
-	$fsm->next({ message => { text => "/cancel" }});
-	$mock->called_ok("send_start_message");
-	$mock->called_ok("send_contact_message");
+	_calls_ok($fsm, { message => { text => "/cancel" }}, $mock, [
+			"send_start_message",
+			"send_contact_message"]);
 
-	$mock->clear();
 	$mock->set_always("save_contact", undef);
-	$fsm->next({ message => { contact => 0 }});
-	$mock->called_ok("save_contact");
-	$mock->called_ok("send_contact_failed");
-	$mock->called_ok("send_contact_message");
+	_calls_ok($fsm, { message => { contact => 0 }}, $mock, [
+			"save_contact",
+			"send_contact_failed",
+			"send_contact_message"]);
 
-	$mock->clear();
 	$mock->set_always("save_contact", 1);
-	$fsm->next({ message => { contact => 0 }});
-	$mock->called_ok("save_contact");
-	$mock->called_ok("send_begin_message");
-	$mock->called_ok("send_resources");
+	_calls_ok($fsm, { message => { contact => 0 }}, $mock, [
+			"save_contact",
+			"send_begin_message",
+			"send_resources"]);
 };
