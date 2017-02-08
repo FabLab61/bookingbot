@@ -133,10 +133,8 @@ sub do_duration {
 		sort { $a->[0] <=> $b->[0] }
 		map { [$durations->{$_}, $_] }
 		grep {
-			my $duration = $self->{dtf}->dur(
-				minutes => $durations->{$_});
-			my $vacancies = $self->{resources}->vacancies(
-				$resource, $duration);
+			my $duration = $self->{dtf}->dur(minutes => $durations->{$_});
+			my $vacancies = $self->{resources}->vacancies($resource, $duration);
 			scalar @$vacancies;
 		} keys %$durations;
 

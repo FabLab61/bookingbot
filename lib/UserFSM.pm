@@ -68,7 +68,7 @@ sub new {
 				do => sub { $ctrl->do_duration(@_); },
 				rules => [
 					DURATION_NOT_FOUND => sub { $ctrl->duration_rule_duration_not_found(@_); },
-					DURATION_NOT_FOUND => sub { $ctrl->duration_rule_datetime(@_); },
+					DATETIME => sub { $ctrl->duration_rule_datetime(@_); },
 
 					BEGIN => \&FSMUtils::_start,
 					CANCEL => \&FSMUtils::_cancel,
