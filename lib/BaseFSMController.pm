@@ -16,8 +16,11 @@ sub new {
 }
 
 sub transition {
-	my ($self, $state) = @_;
+	my ($self, $state, $message) = @_;
 	$state->message("transition");
+	if (defined $message) {
+		$self->send_message($message);
+	}
 }
 
 sub send_message {

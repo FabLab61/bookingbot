@@ -3,11 +3,10 @@ package InstructorFSMController;
 use strict;
 use warnings;
 
+use FSMUtils;
 use Localization qw(lz dt);
 
-use FSMUtils;
-
-use DumperUtils; # TODO: remove
+use DumperUtils; # TODO: remove (see also do_record method)
 
 use parent ("BaseFSMController");
 
@@ -39,8 +38,7 @@ sub _rule_cancel {
 
 sub do_start {
 	my ($self, $state) = @_;
-	$self->transition($state);
-	$self->send_message(lz("instructor_start"));
+	$self->transition($state, lz("instructor_start"));
 }
 
 ################################################################################
@@ -48,8 +46,7 @@ sub do_start {
 
 sub do_cancel {
 	my ($self, $state) = @_;
-	$self->transition($state);
-	$self->send_message(lz("instructor_operation_cancelled"));
+	$self->transition($state, lz("instructor_operation_cancelled"));
 }
 
 ################################################################################
@@ -80,8 +77,7 @@ sub silent_menu_rule_resource {
 
 sub do_schedule {
 	my ($self, $state) = @_;
-	$self->transition($state);
-	$self->send_message(lz("instructor_schedule"));
+	$self->transition($state, lz("instructor_schedule"));
 
 	my $instructor = $self->{instructors}->name($self->{user}->{id});
 	my $schedule = $self->{resources}->schedule($instructor);
@@ -144,8 +140,7 @@ sub resource_rule_cancel {
 
 sub do_resource_not_found {
 	my ($self, $state) = @_;
-	$self->transition($state);
-	$self->send_message(lz("instructor_resource_not_found"));
+	$self->transition($state, lz("instructor_resource_not_found"));
 }
 
 ################################################################################
@@ -153,8 +148,7 @@ sub do_resource_not_found {
 
 sub do_resource_failed {
 	my ($self, $state) = @_;
-	$self->transition($state);
-	$self->send_message(lz("invalid_resource"));
+	$self->transition($state, lz("invalid_resource"));
 }
 
 ################################################################################
@@ -187,8 +181,7 @@ sub time_rule_record {
 
 sub do_time_failed {
 	my ($self, $state) = @_;
-	$self->transition($state);
-	$self->send_message(lz("invalid_time"));
+	$self->transition($state, lz("invalid_time"));
 }
 
 ################################################################################

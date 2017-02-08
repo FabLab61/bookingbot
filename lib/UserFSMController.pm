@@ -3,12 +3,15 @@ package UserFSMController;
 use strict;
 use warnings;
 
+use FSMUtils;
 use Localization qw(lz dt);
 
 use parent ("BaseFSMController");
 
 sub new {
-	my ($class, $user, $chat_id, $api, $contacts, $durations, $instructors, $resources) = @_;
+	my ($class, $user,
+		$chat_id, $api,
+		$contacts, $durations, $instructors, $resources) = @_;
 
 	my $self = $class->SUPER::new($chat_id, $api);
 	$self->{user} = $user;
@@ -21,36 +24,52 @@ sub new {
 	$self;
 }
 
-sub send_start_message {
-	my ($self) = @_;
-	$self->send_message(lz("start"));
+################################################################################
+# START
+
+sub do_start {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("start"));
 }
 
-sub send_contact_message {
-	my ($self) = @_;
+################################################################################
+# CONTACT
+
+sub do_contact {
+	my ($self, $state) = @_;
 	$self->send_message(lz("contact"));
 }
 
-sub save_contact {
-	my ($self, $contact) = @_;
+sub contact_rule_begin {
+	my ($self, $state, $update) = @_;
+	my $contact = $update->{message}->{contact};
 	if (defined $contact) {
 		$self->{contacts}->add($self->{user}->{id}, $contact);
 		1;
 	}
 }
 
-sub send_contact_failed {
-	my ($self) = @_;
-	$self->send_message(lz("invalid_contact"));
+################################################################################
+# CONTACT_FAILED
+
+sub do_contact_failed {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("invalid_contact"));
 }
 
-sub send_begin_message {
-	my ($self) = @_;
-	$self->send_message(lz("begin"));
+################################################################################
+# BEGIN
+
+sub do_begin {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("begin"));
 }
 
-sub send_resources {
-	my ($self) = @_;
+################################################################################
+# RESOURCE
+
+sub do_resource {
+	my ($self, $state) = @_;
 
 	my @durations = sort { $a <=> $b } values %{$self->{durations}};
 	my $min = $self->{dtf}->dur(minutes => shift @durations);
@@ -61,34 +80,52 @@ sub send_resources {
 
 	if (@keyboard) {
 		$self->send_keyboard(lz("select_resource"), \@keyboard);
+		$state->result(1);
 	} else {
-		undef;
+		$self->transition($state);
+		$state->result(undef);
 	}
 }
 
-sub _parse_resource {
-	my ($self, $name) = @_;
-	$self->{resources}->exists($name) ? $name : undef;
+sub resource_rule_resource_not_found {
+	my ($self, $state) = @_;
+	not defined $state->result;
 }
 
-sub get_resource_parser {
-	my ($self) = @_;
-	$self->_parse_resource;
+sub resource_rule_duration {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub {
+		FSMUtils::_parse_value($state, sub {
+			my ($name) = @_;
+			$self->{resources}->exists($name) ? $name : undef;
+		}, shift);
+	});
 }
 
-sub send_resource_not_found {
-	my ($self) = @_;
-	$self->send_message(lz("resource_not_found"));
+################################################################################
+# RESOURCE_NOT_FOUND
+
+sub do_resource_not_found {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("resource_not_found"));
 }
 
-sub send_resource_failed {
-	my ($self) = @_;
-	$self->send_message(lz("invalid_resource"));
+################################################################################
+# RESOURCE_FAILED
+
+sub do_resource_failed {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("invalid_resource"));
 }
 
-sub send_durations {
-	my ($self, $resource) = @_;
+################################################################################
+# DURATION
 
+sub do_duration {
+	my ($self, $state) = @_;
+
+	my $machine = $state->machine;
+	my $resource = $machine->last_result("RESOURCE");
 	my $durations = $self->{durations};
 
 	my @keyboard =
@@ -104,77 +141,134 @@ sub send_durations {
 		} keys %$durations;
 
 	if (@keyboard) {
-		$self->{api}->send_keyboard({
-			text => lz("select_duration"),
-			keyboard => \@keyboard
-		});
+		$self->send_keyboard(lz("select_duration"), \@keyboard);
+		$state->result(1);
 	} else {
-		undef;
+		$self->transition($state);
+		$state->result(undef);
 	}
 }
 
-sub parse_duration {
-	my ($self, $arg) = @_;
-	my $durations = $self->{durations};
-	my @result = grep { lz($_) eq $arg } keys %$durations;
-	scalar @result
-		? $self->{dtf}->dur(minutes => $durations->{$result[0]})
-		: undef;
+sub duration_rule_duration_not_found {
+	my ($self, $state) = @_;
+	not defined $state->result;
 }
 
-sub send_duration_not_found {
-	my ($self) = @_;
-	$self->send_message(lz("duration_not_found"));
-}
-
-sub send_duration_failed {
-	my ($self) = @_;
-	$self->send_message(lz("invalid_duration"));
-}
-
-sub send_datetime_selector {
-	my ($self, $resource, $duration) = @_;
-
-	my $vacancies = $self->{resources}->vacancies(
-		$resource, $duration);
-	my @keyboard = map { dt($_->{span}->start) } @$vacancies;
-
-	$self->{api}->send_keyboard({
-		text => lz("select_datetime"),
-		keyboard => \@keyboard
+sub duration_rule_datetime {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub {
+		FSMUtils::_parse_value($state, sub {
+			my ($value) = @_;
+			my $durations = $self->{durations};
+			my @result = grep { lz($_) eq $value } keys %$durations;
+			scalar @result
+				? $self->{dtf}->dur(minutes => $durations->{$result[0]})
+				: undef;
+		}, shift);
 	});
 }
 
-sub parse_datetime {
-	my ($self, $inputstr) = @_;
-	$self->{dtf}->parse($inputstr);
+################################################################################
+# DURATION_NOT_FOUND
+
+sub do_duration_not_found {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("duration_not_found"));
 }
 
-sub send_datetime_failed {
-	my ($self) = @_;
-	$self->send_message(lz("invalid_datetime"));
+################################################################################
+# DURATION_FAILED
+
+sub do_duration_failed {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("invalid_duration"));
 }
 
-sub parse_instructor {
-	my ($self, $resource, $datetime, $duration) = @_;
+################################################################################
+# DATETIME
 
-	my $span = $self->{dtf}->span_d($datetime, $duration);
-	my $vacancies = $self->{resources}->vacancies(
-		$resource, $duration);
+sub do_datetime {
+	my ($self, $state) = @_;
 
-	my @result = map { $_->{instructor} }
-		grep { $_->{span}->contains($span) } @$vacancies;
+	my $machine = $state->machine;
+	my $resource = $machine->last_result("RESOURCE");
+	my $duration = $machine->last_result("DURATION");
 
-	scalar @result ? $result[0] : undef;
+	my $vacancies = $self->{resources}->vacancies($resource, $duration);
+	my @keyboard = map { dt($_->{span}->start) } @$vacancies;
+
+	$self->send_keyboard(lz("select_datetime"), \@keyboard)
 }
 
-sub send_instructor_failed {
-	my ($self) = @_;
-	$self->send_message(lz("instructor_not_found"));
+sub datetime_rule_instructor {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub {
+		FSMUtils::_parse_value($state, sub {
+			$self->{dtf}->parse(shift);
+		}, shift);
+	});
 }
 
-sub book {
-	my ($self, $resource, $datetime, $duration, $instructor) = @_;
+################################################################################
+# DATETIME_FAILED
+
+sub do_datetime_failed {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("invalid_datetime"));
+}
+
+################################################################################
+# INSTRUCTOR
+
+sub do_instructor {
+	my ($self, $state) = @_;
+	$self->transition($state);
+}
+
+sub instructor_rule_book {
+	my ($self, $state) = @_;
+
+	my ($state) = @_;
+
+	my $machine = $state->machine;
+	my $resource = $machine->last_result("RESOURCE");
+	my $datetime = $machine->last_result("DATETIME");
+	my $duration = $machine->last_result("DURATION");
+
+	FSMUtils::_parse_value($state, sub {
+		my ($resource, $datetime, $duration) = @_;
+
+		my $span = $self->{dtf}->span_d($datetime, $duration);
+		my $vacancies = $self->{resources}->vacancies(
+			$resource, $duration);
+
+		my @result = map { $_->{instructor} }
+			grep { $_->{span}->contains($span) } @$vacancies;
+
+		scalar @result ? $result[0] : undef;
+	}, $resource, $datetime, $duration);
+}
+
+################################################################################
+# INSTRUCTOR_NOT_FOUND
+
+sub do_instructor_not_found {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("instructor_not_found"));
+}
+
+################################################################################
+# BOOK
+
+sub do_book {
+	my ($self, $state) = @_;
+	$self->transition($state);
+
+	my $machine = $state->machine;
+	my $resource = $machine->last_result("RESOURCE");
+	my $datetime = $machine->last_result("DATETIME");
+	my $duration = $machine->last_result("DURATION");
+	my $instructor = $machine->last_result("INSTRUCTOR");
 
 	my $span = $self->{dtf}->span_d($datetime, $duration);
 	$self->{resources}->book(
@@ -192,9 +286,22 @@ sub book {
 		$instructor, $self->{user}, $resource, $span);
 }
 
-sub send_refresh {
-	my ($self) = @_;
+################################################################################
+# CANCEL
+
+sub do_cancel {
+	my ($self, $state) = @_;
+	$self->transition($state);
+}
+
+################################################################################
+# REFRESH
+
+sub do_refresh {
+	my ($self, $state) = @_;
 	$self->send_keyboard(lz("press_refresh_button"), [lz("refresh")]);
 }
+
+################################################################################
 
 1;

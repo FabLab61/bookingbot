@@ -10,30 +10,19 @@ use FSMUtils;
 use parent ("BaseFSM");
 
 sub new {
-	my ($class, $controller) = @_;
+	my ($class, $ctrl) = @_;
 
 	my $self = {
 		fsa => FSA::Rules->new(
 			START => {
-				# init machine here
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_start_message();
-				},
+				do => sub { $ctrl->do_start(@_); },
 				rules => [CONTACT => 1],
 			},
 
 			CONTACT => {
-				do => sub { $controller->send_contact_message(); },
+				do => sub { $ctrl->do_contact(@_); },
 				rules => [
-					BEGIN => sub {
-						my ($state, $update) = @_;
-						my $contact = $update->{message}->{contact};
-						if (defined $contact) {
-							$controller->save_contact($contact);
-						}
-					},
+					BEGIN => sub { $ctrl->contact_rule_begin(@_); },
 
 					START => \&FSMUtils::_start,
 					START => \&FSMUtils::_cancel,
@@ -43,47 +32,20 @@ sub new {
 			},
 
 			CONTACT_FAILED => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_contact_failed();
-				},
+				do => sub { $ctrl->do_contact_failed(@_); },
 				rules => [CONTACT => 1],
 			},
 
 			BEGIN => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_begin_message();
-				},
+				do => sub { $ctrl->do_begin(@_); },
 				rules => [RESOURCE => 1],
 			},
 
 			RESOURCE => {
-				do => sub {
-					my ($state) = @_;
-					if (not defined $controller->send_resources()) {
-						$state->message("transition");
-						$state->result(undef);
-					} else {
-						$state->result(1);
-					}
-				},
+				do => sub { $ctrl->do_resource(@_); },
 				rules => [
-					RESOURCE_NOT_FOUND => sub {
-						my ($state) = @_;
-						not defined $state->result;
-					},
-
-					DURATION => sub {
-						my ($state, $update) = @_;
-						FSMUtils::_with_text($update, sub {
-							my ($text) = @_;
-							FSMUtils::_parse_value($state,
-								$controller->get_resource_parser(), $text);
-						});
-					},
+					RESOURCE_NOT_FOUND => sub { $ctrl->resource_rule_resource_not_found(@_); },
+					DURATION => sub { $ctrl->resource_rule_duration(@_); },
 
 					BEGIN => \&FSMUtils::_start,
 					CANCEL => \&FSMUtils::_cancel,
@@ -93,53 +55,20 @@ sub new {
 			},
 
 			RESOURCE_NOT_FOUND => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_resource_not_found();
-				},
+				do => sub { $ctrl->do_resource_not_found(@_); },
 				rules => [REFRESH => 1],
 			},
 
 			RESOURCE_FAILED => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_resource_failed();
-				},
+				do => sub { $ctrl->do_resource_failed(@_); },
 				rules => [RESOURCE => 1],
 			},
 
 			DURATION => {
-				do => sub {
-					my ($state) = @_;
-
-					my $machine = $state->machine;
-					my $resource = $machine->last_result("RESOURCE");
-
-					if (not defined $controller->send_durations($resource)) {
-						$state->message("transition");
-						$state->result(undef);
-					} else {
-						$state->result(1);
-					}
-				},
+				do => sub { $ctrl->do_duration(@_); },
 				rules => [
-					DURATION_NOT_FOUND => sub {
-						my ($state) = @_;
-						not defined $state->result;
-					},
-
-					DATETIME => sub {
-						my ($state, $update) = @_;
-						FSMUtils::_with_text($update, sub {
-							my ($text) = @_;
-							FSMUtils::_parse_value(
-									$state,
-									$controller->parse_duration,
-									$text);
-						});
-					},
+					DURATION_NOT_FOUND => sub { $ctrl->duration_rule_duration_not_found(@_); },
+					DURATION_NOT_FOUND => sub { $ctrl->duration_rule_datetime(@_); },
 
 					BEGIN => \&FSMUtils::_start,
 					CANCEL => \&FSMUtils::_cancel,
@@ -149,42 +78,19 @@ sub new {
 			},
 
 			DURATION_NOT_FOUND => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_duration_not_found();
-				},
+				do => sub { $ctrl->do_duration_not_found(@_); },
 				rules => [REFRESH => 1],
 			},
 
 			DURATION_FAILED => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_duration_failed();
-				},
+				do => sub { $ctrl->do_duration_failed(@_); },
 				rules => [DURATION => 1],
 			},
 
 			DATETIME => {
-				do => sub {
-					my ($state) = @_;
-
-					my $machine = $state->machine;
-					my $resource = $machine->last_result("RESOURCE");
-					my $duration = $machine->last_result("DURATION");
-
-					$controller->send_datetime_selector($resource, $duration);
-				},
+				do => sub { $ctrl->do_datetime(@_); },
 				rules => [
-					INSTRUCTOR => sub {
-						my ($state, $update) = @_;
-						FSMUtils::_with_text($update, sub {
-							my ($text) = @_;
-							FSMUtils::_parse_value($state,
-								$controller->parse_datetime, $text);
-						});
-					},
+					INSTRUCTOR => sub { $ctrl->datetime_rule_instructor(@_); },
 
 					BEGIN => \&FSMUtils::_start,
 					CANCEL => \&FSMUtils::_cancel,
@@ -194,75 +100,35 @@ sub new {
 			},
 
 			DATETIME_FAILED => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_datetime_failed();
-				},
+				do => sub { $ctrl->do_datetime_failed(@_); },
 				rules => [DATETIME => 1],
 			},
 
 			INSTRUCTOR => {
-				do => sub { shift->message("transition"); },
+				do => sub { $ctrl->do_instructor(@_); },
 				rules => [
-					BOOK => sub {
-						my ($state) = @_;
-
-						my $machine = $state->machine;
-						my $resource = $machine->last_result("RESOURCE");
-						my $datetime = $machine->last_result("DATETIME");
-						my $duration = $machine->last_result("DURATION");
-
-						FSMUtils::_parse_value(
-								$state,
-								$controller->parse_instructor,
-								$resource,
-								$datetime,
-								$duration);
-					},
-					INSTRUCTOR_FAILED => 1
+					BOOK => sub { $ctrl->instructor_rule_book(@_); },
+					INSTRUCTOR_NOT_FOUND => 1
 				],
 			},
 
-			INSTRUCTOR_FAILED => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-					$controller->send_instructor_failed();
-				},
+			INSTRUCTOR_NOT_FOUND => {
+				do => sub { $ctrl->do_instructor_not_found(@_); },
 				rules => [DATETIME => 1],
 			},
 
 			BOOK => {
-				do => sub {
-					my ($state) = @_;
-					$state->message("transition");
-
-					my $machine = $state->machine;
-					my $resource = $machine->last_result("RESOURCE");
-					my $datetime = $machine->last_result("DATETIME");
-					my $duration = $machine->last_result("DURATION");
-					my $instructor = $machine->last_result("INSTRUCTOR");
-
-					$controller->book(
-							$resource,
-							$datetime,
-							$duration,
-							$instructor);
-				},
+				do => sub { $ctrl->do_book(@_); },
 				rules => [BEGIN => 1],
 			},
 
 			CANCEL => {
-				do => sub { shift->message("transition"); },
+				do => sub { $ctrl->do_cancel(@_); },
 				rules => [BEGIN => 1],
 			},
 
 			REFRESH => {
-				do => sub {
-					my ($state) = @_;
-					$controller->send_refresh();
-				},
+				do => sub { $ctrl->do_refresh(@_); },
 				rules => [BEGIN => 1],
 			},
 		)
