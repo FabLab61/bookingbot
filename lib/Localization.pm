@@ -41,6 +41,7 @@ my %strings = (
 
 		"user_start"                          => "Hello! I am booking bot",
 		"user_contact"                        => "Share your contact with me in order to book tools",
+		"user_share_contact"                  => "✅ Share contact",
 		"user_invalid_contact"                => "This is not information I need, try again, please",
 		"user_begin"                          => "OK, let's begin",
 		"user_select_resource"                => "Select tool for booking",
@@ -106,6 +107,7 @@ my %strings = (
 
 		"user_start"                          => "Привет! Я бот для бронирования оборудования",
 		"user_contact"                        => "Пришли мне свои контакты, чтобы получить доступ к бронированию",
+		"user_share_contact"                  => "✅ Отправить контакты",
 		"user_invalid_contact"                => "Это не то, что мне нужно, попробуй ещё раз",
 		"user_begin"                          => "OK, приступим 👌",
 		"user_select_resource"                => "⚠ Выбери оборудование для бронирования",

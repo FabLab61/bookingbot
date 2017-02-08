@@ -46,7 +46,10 @@ sub do_cancel {
 
 sub do_contact {
 	my ($self, $state) = @_;
-	$self->send_message(lz("user_contact"));
+	$self->send_keyboard(lz("user_contact"), [{
+		text => lz("user_share_contact"),
+		request_contact => \1
+	}]);
 }
 
 sub contact_rule_begin {
