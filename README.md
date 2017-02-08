@@ -18,7 +18,7 @@ _Run `dockerctl.sh help` for more run options._
 
 ## Configuration
 
-Configuration file named `bot.json` and has following structure (comments separated with `#`):
+Configuration file named `bot.pl.json` and has following structure (comments separated with `#`):
 
 ```
 {
@@ -54,7 +54,7 @@ Configuration file named `bot.json` and has following structure (comments separa
 
 ## Usage
 
-1. Register your instructors in `bot.json`.
+1. Register your instructors in `bot.pl.json`.
 2. Let instructors add their schedule to resources' calendars. Here is some rules they have to follow:
 
     - instructors must use their human-readable id (see *Configuration* section) as summary for their events;
