@@ -29,7 +29,7 @@ sub new {
 
 sub do_start {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("start"));
+	$self->transition($state, lz("user_start"));
 }
 
 ################################################################################
@@ -45,7 +45,7 @@ sub do_cancel {
 
 sub do_contact {
 	my ($self, $state) = @_;
-	$self->send_message(lz("contact"));
+	$self->send_message(lz("user_contact"));
 }
 
 sub contact_rule_begin {
@@ -62,7 +62,7 @@ sub contact_rule_begin {
 
 sub do_contact_failed {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("invalid_contact"));
+	$self->transition($state, lz("user_invalid_contact"));
 }
 
 ################################################################################
@@ -70,7 +70,7 @@ sub do_contact_failed {
 
 sub do_begin {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("begin"));
+	$self->transition($state, lz("user_begin"));
 }
 
 ################################################################################
@@ -87,7 +87,7 @@ sub do_resource {
 	} @{$self->{resources}->names};
 
 	if (@keyboard) {
-		$self->send_keyboard(lz("select_resource"), \@keyboard);
+		$self->send_keyboard(lz("user_select_resource"), \@keyboard);
 		$state->result(1);
 	} else {
 		$self->transition($state);
@@ -115,7 +115,7 @@ sub resource_rule_duration {
 
 sub do_resource_not_found {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("resource_not_found"));
+	$self->transition($state, lz("user_resource_not_found"));
 }
 
 ################################################################################
@@ -123,7 +123,7 @@ sub do_resource_not_found {
 
 sub do_resource_failed {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("invalid_resource"));
+	$self->transition($state, lz("user_invalid_resource"));
 }
 
 ################################################################################
@@ -148,7 +148,7 @@ sub do_duration {
 
 	if (@keyboard) {
 		push @keyboard, lz("cancel");
-		$self->send_keyboard(lz("select_duration"), \@keyboard);
+		$self->send_keyboard(lz("user_select_duration"), \@keyboard);
 		$state->result(1);
 	} else {
 		$self->transition($state);
@@ -185,7 +185,7 @@ sub duration_rule_cancel {
 
 sub do_duration_not_found {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("duration_not_found"));
+	$self->transition($state, lz("user_duration_not_found"));
 }
 
 ################################################################################
@@ -193,7 +193,7 @@ sub do_duration_not_found {
 
 sub do_duration_failed {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("invalid_duration"));
+	$self->transition($state, lz("user_invalid_duration"));
 }
 
 ################################################################################
@@ -210,7 +210,7 @@ sub do_datetime {
 	my @keyboard = map { dt($_->{span}->start) } @$vacancies;
 
 	push @keyboard, lz("back"), lz("cancel");
-	$self->send_keyboard(lz("select_datetime"), \@keyboard)
+	$self->send_keyboard(lz("user_select_datetime"), \@keyboard)
 }
 
 sub datetime_rule_instructor {
@@ -237,7 +237,7 @@ sub datetime_rule_cancel {
 
 sub do_datetime_failed {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("invalid_datetime"));
+	$self->transition($state, lz("user_invalid_datetime"));
 }
 
 ################################################################################
@@ -275,7 +275,7 @@ sub instructor_rule_book {
 
 sub do_instructor_not_found {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("instructor_not_found"));
+	$self->transition($state, lz("user_instructor_not_found"));
 }
 
 ################################################################################
@@ -296,7 +296,7 @@ sub do_book {
 		lz("booked_by", $self->{contacts}->fullname($self->{user}->{id})),
 		$resource, $span);
 
-	$self->send_message(lz("booked", $resource, dt($datetime)));
+	$self->send_message(lz("user_booked", $resource, dt($datetime)));
 
 	if ($self->{instructors}->exists($instructor)) {
 		$self->{instructors}->share_contact($instructor, $self->{chat_id});
@@ -312,7 +312,7 @@ sub do_book {
 
 sub do_refresh {
 	my ($self, $state) = @_;
-	$self->send_keyboard(lz("press_refresh_button"), [lz("refresh")]);
+	$self->send_keyboard(lz("user_press_refresh_button"), [lz("user_refresh")]);
 }
 
 ################################################################################

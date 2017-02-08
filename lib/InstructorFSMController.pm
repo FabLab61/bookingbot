@@ -77,7 +77,7 @@ sub do_schedule {
 		foreach my $event (@{$schedule->{$resource}}) {
 			$text .= dt($event->{span}->start) . " - ";
 			$text .= dt($event->{span}->end) . ": ";
-			$text .= ($event->{busy} ? lz("busy") : lz("free")) . "\n";
+			$text .= ($event->{busy} ? lz("instructor_busy") : lz("instructor_free")) . "\n";
 		}
 	}
 
@@ -137,7 +137,7 @@ sub do_resource_not_found {
 
 sub do_resource_failed {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("invalid_resource"));
+	$self->transition($state, lz("instructor_invalid_resource"));
 }
 
 ################################################################################
@@ -145,11 +145,8 @@ sub do_resource_failed {
 
 sub do_time {
 	my ($self, $state) = @_;
-	my @keyboard = (
-		lz("back"),
-		lz("cancel"),
-	);
-	$self->send_keyboard(lz("instructor_time"), \@keyboard);
+	my @keyboard = (lz("back"), lz("cancel"));
+	$self->send_keyboard(lz("instructor_enter_time"), \@keyboard);
 }
 
 sub time_rule_cancel {
@@ -176,7 +173,7 @@ sub time_rule_resource {
 
 sub do_time_failed {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("invalid_time"));
+	$self->transition($state, lz("instructor_invalid_time"));
 }
 
 ################################################################################
@@ -194,7 +191,7 @@ sub do_record {
 
 	$self->{resources}->record($instructor, $resource, $span);
 
-	$self->send_message(lz("record_saved"));
+	$self->send_message(lz("instructor_record_saved"));
 }
 
 ################################################################################
