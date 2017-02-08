@@ -19,14 +19,15 @@ sub new {
 				rules => [CONTACT => 1],
 			},
 
+			CANCEL => {
+				do => sub { $ctrl->do_cancel(@_); },
+				rules => [BEGIN => 1],
+			},
+
 			CONTACT => {
 				do => sub { $ctrl->do_contact(@_); },
 				rules => [
 					BEGIN => sub { $ctrl->contact_rule_begin(@_); },
-
-					START => \&FSMUtils::_start,
-					START => \&FSMUtils::_cancel,
-
 					CONTACT_FAILED => 1
 				],
 			},
@@ -46,10 +47,6 @@ sub new {
 				rules => [
 					RESOURCE_NOT_FOUND => sub { $ctrl->resource_rule_resource_not_found(@_); },
 					DURATION => sub { $ctrl->resource_rule_duration(@_); },
-
-					BEGIN => \&FSMUtils::_start,
-					CANCEL => \&FSMUtils::_cancel,
-
 					RESOURCE_FAILED => 1
 				],
 			},
@@ -70,8 +67,7 @@ sub new {
 					DURATION_NOT_FOUND => sub { $ctrl->duration_rule_duration_not_found(@_); },
 					DATETIME => sub { $ctrl->duration_rule_datetime(@_); },
 
-					BEGIN => \&FSMUtils::_start,
-					CANCEL => \&FSMUtils::_cancel,
+					CANCEL => sub { $ctrl->duration_rule_cancel(@_); },
 
 					DURATION_FAILED => 1
 				],
@@ -92,8 +88,8 @@ sub new {
 				rules => [
 					INSTRUCTOR => sub { $ctrl->datetime_rule_instructor(@_); },
 
-					BEGIN => \&FSMUtils::_start,
-					CANCEL => \&FSMUtils::_cancel,
+					DURATION => sub { $ctrl->datetime_rule_duration(@_); },
+					CANCEL => sub { $ctrl->datetime_rule_cancel(@_); },
 
 					DATETIME_FAILED => 1
 				],
@@ -119,11 +115,6 @@ sub new {
 
 			BOOK => {
 				do => sub { $ctrl->do_book(@_); },
-				rules => [BEGIN => 1],
-			},
-
-			CANCEL => {
-				do => sub { $ctrl->do_cancel(@_); },
 				rules => [BEGIN => 1],
 			},
 

@@ -22,14 +22,6 @@ sub new {
 	$self;
 }
 
-sub _rule_cancel {
-	my ($self, $state, $update) = @_;
-	FSMUtils::_with_text($update, sub {
-		my ($text) = @_;
-		$text eq lz("instructor_cancel_operation");
-	});
-}
-
 ################################################################################
 # START
 
@@ -43,7 +35,7 @@ sub do_start {
 
 sub do_cancel {
 	my ($self, $state) = @_;
-	$self->transition($state, lz("instructor_operation_cancelled"));
+	$self->transition($state, lz("operation_cancelled"));
 }
 
 ################################################################################
@@ -103,7 +95,7 @@ sub do_resource {
 	my ($self, $state) = @_;
 	my @keyboard = @{$self->{resources}->names};
 	if (@keyboard) {
-		push @keyboard, lz("instructor_cancel_operation");
+		push @keyboard, lz("cancel");
 		$self->send_keyboard(lz("instructor_select_resource"), \@keyboard);
 		$state->result(1);
 	} else {
@@ -129,7 +121,7 @@ sub resource_rule_time {
 
 sub resource_rule_cancel {
 	my ($self, $state, $update) = @_;
-	$self->_rule_cancel($state, $update);
+	$self->rule_cancel($state, $update);
 }
 
 ################################################################################
@@ -154,14 +146,15 @@ sub do_resource_failed {
 sub do_time {
 	my ($self, $state) = @_;
 	my @keyboard = (
-		lz("instructor_cancel_operation"),
+		lz("back"),
+		lz("cancel"),
 	);
 	$self->send_keyboard(lz("instructor_time"), \@keyboard);
 }
 
 sub time_rule_cancel {
 	my ($self, $state, $update) = @_;
-	$self->_rule_cancel($state, $update);
+	$self->rule_cancel($state, $update);
 }
 
 sub time_rule_record {
@@ -171,6 +164,11 @@ sub time_rule_record {
 			$self->{recordtimeparser}->parse(shift);
 		}, shift);
 	});
+}
+
+sub time_rule_resource {
+	my ($self, $state, $update) = @_;
+	$self->rule_back($state, $update);
 }
 
 ################################################################################

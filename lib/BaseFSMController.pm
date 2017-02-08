@@ -3,6 +3,8 @@ package BaseFSMController;
 use strict;
 use warnings;
 
+use Localization qw(lz);
+
 sub new {
 	my ($class, $chat_id, $api) = @_;
 
@@ -38,6 +40,16 @@ sub send_keyboard {
 		text => $text,
 		keyboard => $keyboard
 	});
+}
+
+sub rule_back {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub { shift eq lz("back"); });
+}
+
+sub rule_cancel {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub { shift eq lz("cancel"); });
 }
 
 1;

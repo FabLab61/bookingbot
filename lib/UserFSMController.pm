@@ -33,6 +33,14 @@ sub do_start {
 }
 
 ################################################################################
+# CANCEL
+
+sub do_cancel {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("operation_cancelled"));
+}
+
+################################################################################
 # CONTACT
 
 sub do_contact {
@@ -139,6 +147,7 @@ sub do_duration {
 		} keys %$durations;
 
 	if (@keyboard) {
+		push @keyboard, lz("cancel");
 		$self->send_keyboard(lz("select_duration"), \@keyboard);
 		$state->result(1);
 	} else {
@@ -164,6 +173,11 @@ sub duration_rule_datetime {
 				: undef;
 		}, shift);
 	});
+}
+
+sub duration_rule_cancel {
+	my ($self, $state, $update) = @_;
+	$self->rule_cancel($state, $update);
 }
 
 ################################################################################
@@ -195,6 +209,7 @@ sub do_datetime {
 	my $vacancies = $self->{resources}->vacancies($resource, $duration);
 	my @keyboard = map { dt($_->{span}->start) } @$vacancies;
 
+	push @keyboard, lz("back"), lz("cancel");
 	$self->send_keyboard(lz("select_datetime"), \@keyboard)
 }
 
@@ -205,6 +220,16 @@ sub datetime_rule_instructor {
 			$self->{dtf}->parse(shift);
 		}, shift);
 	});
+}
+
+sub datetime_rule_duration {
+	my ($self, $state, $update) = @_;
+	$self->rule_back($state, $update);
+}
+
+sub datetime_rule_cancel {
+	my ($self, $state, $update) = @_;
+	$self->rule_cancel($state, $update);
 }
 
 ################################################################################
@@ -280,14 +305,6 @@ sub do_book {
 	}
 	$self->{instructors}->notify_groups(
 		$instructor, $self->{user}, $resource, $span);
-}
-
-################################################################################
-# CANCEL
-
-sub do_cancel {
-	my ($self, $state) = @_;
-	$self->transition($state);
 }
 
 ################################################################################

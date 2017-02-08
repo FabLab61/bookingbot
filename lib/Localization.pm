@@ -33,6 +33,11 @@ my %strings = (
 		"2_hours"                             => "2 hours",
 		"3_hours"                             => "3 hours",
 
+		"back"                                => "⬅️ Back",
+
+		"cancel"                              => "❌ Cancel",
+		"operation_cancelled"                 => "Operation cancelled",
+
 		"start"                               => "Hello! I am FabLab61 booking bot",
 		"contact"                             => "Share your contact with me in order to book tools",
 		"invalid_contact"                     => "This is not information I need. Try again",
@@ -51,11 +56,9 @@ my %strings = (
 		"instructor_contact"                  => "Here is your instructor contact:",
 
 		"press_refresh_button"                => "Press the button to refresh data",
-		"refresh"                             => "Refresh",
+		"refresh"                             => "⬅️ Refresh",
 
 		"instructor_start"                    => "Hello! I am FabLab61 booking bot",
-		"instructor_cancel_operation"         => "❌ Cancel operation",
-		"instructor_operation_cancelled"      => "Operation cancelled",
 		"instructor_menu"                     => "What can I do for you?",
 		"instructor_show_schedule"            => "📒 Show my schedule",
 		"instructor_add_record"               => "➕ Add record to the schedule",
@@ -92,7 +95,7 @@ my %strings = (
 		"start"                               => "Привет! Я бот для бронирования оборудования FabLab61",
 		"contact"                             => "Пришли мне свои контакты, чтобы получить доступ к бронированию",
 		"invalid_contact"                     => "Это не то, что мне нужно, попробуй ещё раз",
-		"begin"                               => "Хорошо, приступим",
+		"begin"                               => "Хорошо, приступим 👌",
 		"select_resource"                     => "⚠ Выбери оборудование для бронирования",
 		"resource_not_found"                  => "Я не нашёл свободного оборудования на данный момент, извини. Попробуй позже",
 		"invalid_resource"                    => "Это не то, что мне нужно. Попробуй ещё раз",
@@ -107,7 +110,7 @@ my %strings = (
 		"instructor_contact"                  => "Вот контакт твоего инструктора:",
 
 		"press_refresh_button"                => "Нажми кнопку чтобы обновить информацию",
-		"refresh"                             => "Обновить",
+		"refresh"                             => "⬅️ Обновить",
 
 		"instructor_new_book"                 => "Привет! Я получил новую заявку на бронирование твоего оборудования. Вот информация, которая у меня есть:\nОборудование: %s\nВремя брони: с %s до %s\nСейчас я пришлю контакты клиента\nТвои контакты уже отправлены\nХорошего дня! 😊",
 
