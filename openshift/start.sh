@@ -1,6 +1,10 @@
 #!/bin/bash
 
+set -e
+
 cd $OPENSHIFT_REPO_DIR/bookingbot 
+
+ln -s bot.pl.json bot.json
 
 git stash
 git pull
