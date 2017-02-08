@@ -71,7 +71,12 @@ sub schedule {
 
 sub book {
 	my ($self, $summary, $span) = @_;
-	Google::CalendarAPI::Events::insert($self->{calendar}, $summary, $span);
+	Google::CalendarAPI::Events::insert($self->{calendar}, $summary, $span, 1);
+}
+
+sub record {
+	my ($self, $instructor, $span) = @_;
+	Google::CalendarAPI::Events::insert($self->{calendar}, $instructor, $span, 0);
 }
 
 1;

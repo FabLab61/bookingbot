@@ -55,12 +55,13 @@ sub list {
 }
 
 sub insert {
-	my ($calendar, $summary, $span) = @_;
+	my ($calendar, $summary, $span, $busy) = @_;
 
 	Google::CalendarAPI::_refresh_token;
 
 	my $event = {};
 	$event->{summary} = $summary;
+	$event->{transparency} = $busy ? "opaque" : "transparent";
 
 	$event->{start}{dateTime} = $dtf->rfc3339($span->start);
 	$event->{end}{dateTime} = $dtf->rfc3339($span->end);

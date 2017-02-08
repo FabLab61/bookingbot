@@ -228,8 +228,6 @@ sub do_instructor {
 sub instructor_rule_book {
 	my ($self, $state) = @_;
 
-	my ($state) = @_;
-
 	my $machine = $state->machine;
 	my $resource = $machine->last_result("RESOURCE");
 	my $datetime = $machine->last_result("DATETIME");

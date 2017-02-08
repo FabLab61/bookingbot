@@ -56,4 +56,9 @@ sub book {
 	$self->{resources}->{$name}->book($summary, $span);
 }
 
+sub record {
+	my ($self, $instructor, $name, $span) = @_;
+	$self->{resources}->{$name}->record($instructor, $span);
+}
+
 1;

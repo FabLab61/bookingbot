@@ -6,8 +6,6 @@ use warnings;
 use FSMUtils;
 use Localization qw(lz dt);
 
-use DumperUtils; # TODO: remove (see also do_record method)
-
 use parent ("BaseFSMController");
 
 sub new {
@@ -16,8 +14,7 @@ sub new {
 		$instructors, $resources, $recordtimeparser) = @_;
 
 	my $self = $class->SUPER::new($chat_id, $api);
-	$self->{user} = $user;
-	$self->{instructors} = $instructors;
+	$self->{instructor} = $instructors->name($user->{id});
 	$self->{resources} = $resources;
 	$self->{recordtimeparser} = $recordtimeparser;
 	$self->{log} = Log->new("instructorfsmcontroller");
@@ -79,7 +76,7 @@ sub do_schedule {
 	my ($self, $state) = @_;
 	$self->transition($state, lz("instructor_schedule"));
 
-	my $instructor = $self->{instructors}->name($self->{user}->{id});
+	my $instructor = $self->{instructor};
 	my $schedule = $self->{resources}->schedule($instructor);
 
 	my $text = "";
@@ -191,12 +188,15 @@ sub do_record {
 	my ($self, $state) = @_;
 	$self->transition($state);
 
+	my $instructor = $self->{instructor};
+
 	my $machine = $state->machine;
 	my $resource = $machine->last_result("RESOURCE");
-	my $time = $machine->last_result("TIME");
+	my $span = $machine->last_result("TIME");
 
-	$self->send_message($resource);
-	$self->send_message(DumperUtils::span2str($time));
+	$self->{resources}->record($instructor, $resource, $span);
+
+	$self->send_message(lz("record_saved"));
 }
 
 ################################################################################
