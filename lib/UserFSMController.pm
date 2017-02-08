@@ -30,6 +30,7 @@ sub new {
 sub do_start {
 	my ($self, $state) = @_;
 	$self->transition($state, lz("user_start"));
+	$self->remove_keyboard();
 }
 
 ################################################################################

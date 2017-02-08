@@ -57,6 +57,15 @@ sub send_keyboard {
 	$self->{log}->debugf("keyboard sent: %s", $params);
 }
 
+sub remove_keyboard {
+	my ($self, $params) = @_;
+	$self->{api}->sendMessage({
+		chat_id => $params->{chat_id},
+		reply_markup => { remove_keyboard => \1 }
+	});
+	$self->{log}->debugf("keyboard removed: %s", $params);
+}
+
 sub send_contact {
 	my ($self, $params) = @_;
 	$self->{api}->sendContact({chat_id => $params->{chat_id},

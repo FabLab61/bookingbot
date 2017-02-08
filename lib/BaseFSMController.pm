@@ -42,6 +42,11 @@ sub send_keyboard {
 	});
 }
 
+sub remove_keyboard {
+	my ($self) = @_;
+	$self->{api}->remove_keyboard({ chat_id => $self->{chat_id} });
+}
+
 sub rule_back {
 	my ($self, $state, $update) = @_;
 	FSMUtils::_with_text($update, sub { shift eq lz("back"); });
