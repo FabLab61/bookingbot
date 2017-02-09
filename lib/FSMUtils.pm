@@ -12,21 +12,6 @@ sub _with_text {
 		: undef
 }
 
-sub _start {
-	my ($state, $update) = @_;
-	_with_text($update, sub { shift eq "/start"; });
-}
-
-sub _help {
-	my ($state, $update) = @_;
-	_with_text($update, sub { shift eq "/help"; });
-}
-
-sub _cancel {
-	my ($state, $update) = @_;
-	_with_text($update, sub { shift eq "/cancel"; });
-}
-
 sub _parse_value {
 	my ($state, $parser, @data) = @_;
 

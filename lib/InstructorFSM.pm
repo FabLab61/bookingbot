@@ -33,9 +33,6 @@ sub new {
 				rules => [
 					SCHEDULE => sub { $ctrl->silent_menu_rule_schedule(@_); },
 					RESOURCE => sub { $ctrl->silent_menu_rule_resource(@_); },
-
-					MENU => \&FSMUtils::_start,
-
 					SILENT_MENU => 1,
 				],
 			},
@@ -50,10 +47,7 @@ sub new {
 				rules => [
 					RESOURCE_NOT_FOUND => sub { $ctrl->resource_rule_resource_not_found(@_); },
 					TIME => sub { $ctrl->resource_rule_time(@_); },
-
-					CANCEL => \&FSMUtils::_start,
 					CANCEL => sub { $ctrl->resource_rule_cancel(@_); },
-
 					RESOURCE_FAILED => 1
 				],
 			},
