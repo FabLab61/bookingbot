@@ -43,8 +43,11 @@ sub send_keyboard {
 }
 
 sub remove_keyboard {
-	my ($self) = @_;
-	$self->{api}->remove_keyboard({ chat_id => $self->{chat_id} });
+	my ($self, $text) = @_;
+	$self->{api}->remove_keyboard({
+		chat_id => $self->{chat_id},
+		text => $text
+	});
 }
 
 sub rule_back {

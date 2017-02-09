@@ -61,6 +61,7 @@ sub remove_keyboard {
 	my ($self, $params) = @_;
 	$self->{api}->sendMessage({
 		chat_id => $params->{chat_id},
+		text => $params->{text},
 		reply_markup => { remove_keyboard => \1 }
 	});
 	$self->{log}->debugf("keyboard removed: %s", $params);
