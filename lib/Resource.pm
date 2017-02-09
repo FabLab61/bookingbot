@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use DateTimeFactory;
+use ScheduleUtils;
 use Google;
 
 sub new {
@@ -15,15 +16,10 @@ sub new {
 sub vacancies {
 	my ($self, $duration, $span) = @_;
 
-	my $dtf = $self->{dtf};
-
 	my $events = Google::CalendarAPI::Events::list($self->{calendar}, $span);
 
 	my @free = map { $_->{span} } grep { $_->{transparent} } @$events;
 	my @busy = map { $_->{span} } grep { not $_->{transparent} } @$events;
-
-	my $freeset = $dtf->spanset(\@free);
-	my $busyset = $dtf->spanset(\@busy);
 
 	sub _enclosing_event {
 		my ($events, $span) = @_;
@@ -36,11 +32,9 @@ sub vacancies {
 	}
 
 	my @result = map {{
-			span => $_,
-			instructor => _enclosing_event($events, $_)->{summary}
-		}}
-		grep { $dtf->durcmp($duration, $_->duration, $_->start) <= 0 }
-		$freeset->complement($busyset)->as_list;
+		span => $_,
+		instructor => _enclosing_event($events, $_)->{summary}
+	}} ScheduleUtils::vacancies(\@free, \@busy, $duration);
 
 	\@result;
 }

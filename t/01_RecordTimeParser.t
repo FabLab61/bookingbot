@@ -4,6 +4,8 @@ use utf8;
 
 use Test::More tests => 3;
 
+use TestUtils;
+
 use DateTimeFactory;
 use RecordTimeParser;
 
@@ -152,14 +154,6 @@ my %data = (
 	}]
 );
 
-sub spanToISOString {
-	my ($span) = @_;
-	my $format = "%FT%R";
-	my $startstr = $span->start->strftime($format);
-	my $endstr = $span->end->strftime($format);
-	$startstr . "-" . $endstr;
-}
-
 subtest "_parse_workinghours" => sub {
 	my $today = DateTime->from_epoch(epoch => 0);
 	my $data = [{
@@ -171,7 +165,7 @@ subtest "_parse_workinghours" => sub {
 	}];
 	foreach my $record (@$data) {
 		my $span = RecordTimeParser::_parse_workinghours($record->{workinghours}, $today);
-		is(spanToISOString($span), $record->{span}, $record->{workinghours});
+		is(TestUtils::span2str($span), $record->{span}, $record->{workinghours});
 	}
 };
 
@@ -201,7 +195,7 @@ subtest "_parse_tokens (russian)" => sub {
 				$tokens, $today, $workinghours);
 
 			if (defined $span) {
-				is(spanToISOString($span), $record->{span}, $record->{input});
+				is(TestUtils::span2str($span), $record->{span}, $record->{input});
 			} else {
 				is(undef, $record->{span}, $record->{input});
 			}
