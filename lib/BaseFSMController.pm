@@ -25,6 +25,12 @@ sub transition {
 	}
 }
 
+sub is_transition {
+	my ($self, $state) = @_;
+	my $message = $state->message;
+	$message && $message eq "transition";
+}
+
 sub send_message {
 	my ($self, $text) = @_;
 	$self->{api}->send_message({

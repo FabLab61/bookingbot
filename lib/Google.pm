@@ -44,6 +44,7 @@ sub list {
 	my @result = grep {
 		defined $_->{summary} and $span->contains($_->{span});
 	} map {{
+		id => $_->{id},
 		summary => $_->{summary},
 		transparent => ($_->{transparency} // "") eq "transparent",
 		span => $dtf->span_se(
@@ -75,7 +76,7 @@ sub delete {
 	Google::CalendarAPI::_refresh_token;
 
 	my $url = "https://www.googleapis.com/calendar/v3/calendars/";
-	$gapi->api_query({
+	$api->api_query({
 		method => "delete",
 		route =>  $url . $calendar . "/events/" . $event,
 		user => $user

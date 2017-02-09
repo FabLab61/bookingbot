@@ -51,6 +51,11 @@ sub schedule {
 	\%result;
 }
 
+sub remove {
+	my ($self, $instructor, $name, $span) = @_;
+	$self->{resources}->{$name}->remove($instructor, $span);
+}
+
 sub book {
 	my ($self, $summary, $name, $span) = @_;
 	$self->{resources}->{$name}->book($summary, $span);

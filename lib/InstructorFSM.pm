@@ -33,13 +33,22 @@ sub new {
 				rules => [
 					SCHEDULE => sub { $ctrl->silent_menu_rule_schedule(@_); },
 					RESOURCE => sub { $ctrl->silent_menu_rule_resource(@_); },
-					SILENT_MENU => 1,
+					SILENT_MENU => 1
 				],
 			},
 
 			SCHEDULE => {
 				do => sub { $ctrl->do_schedule(@_); },
-				rules => [MENU => 1],
+				rules => [REMOVE_SCHEDULE => 1],
+			},
+
+			REMOVE_SCHEDULE => {
+				do => sub { $ctrl->do_remove_schedule(@_); },
+				rules => [
+					CANCEL => sub { $ctrl->remove_schedule_rule_cancel(@_); },
+					REMOVE_SCHEDULE => sub { $ctrl->remove_schedule_rule_remove_schedule(@_); },
+					MENU => 1
+				],
 			},
 
 			RESOURCE => {

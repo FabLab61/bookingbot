@@ -73,12 +73,15 @@ sub do_schedule {
 	my $schedule = $self->{resources}->schedule($instructor);
 
 	my $text = "";
-	foreach my $resource (keys %$schedule) {
+	foreach my $resource (sort { $a cmp $b } keys %$schedule) {
 		$text .= $resource . ":\n";
 		foreach my $event (@{$schedule->{$resource}}) {
 			$text .= dt($event->{span}->start) . " - ";
 			$text .= dt($event->{span}->end) . ": ";
-			$text .= ($event->{busy} ? lz("instructor_busy") : lz("instructor_free")) . "\n";
+			$text .= $event->{busy}
+				? lz("instructor_busy")
+				: lz("instructor_free");
+			$text .= "\n";
 		}
 	}
 
@@ -87,6 +90,64 @@ sub do_schedule {
 	}
 
 	$self->send_message($text);
+}
+
+################################################################################
+# REMOVE_SCHEDULE
+
+sub _schedule_keyboard {
+	my ($schedule) = @_;
+
+	my %result = ();
+	foreach my $resource (keys %$schedule) {
+		foreach my $event (grep { not $_->{busy} } @{$schedule->{$resource}}) {
+			my $start = dt($event->{span}->start);
+			my $end = dt($event->{span}->end);
+			my $key = $resource . ": " . $start .  " - " . $end;
+			$result{$key} = {
+				resource => $resource,
+				span => $event->{span},
+			};
+		}
+	}
+
+	\%result;
+}
+
+sub do_remove_schedule {
+	my ($self, $state) = @_;
+
+	my $instructor = $self->{instructor};
+	my $schedule = $self->{resources}->schedule($instructor);
+	my @keyboard = sort { $a cmp $b } keys %{_schedule_keyboard($schedule)};
+
+	if (scalar @keyboard) {
+		push @keyboard, lz("cancel");
+		$self->send_keyboard(lz("instructor_remove_record"), \@keyboard);
+	} else {
+		$self->transition($state);
+	}
+}
+
+sub remove_schedule_rule_cancel {
+	my ($self, $state, $update) = @_;
+	$self->is_transition($state) ? undef : $self->rule_cancel($state, $update);
+}
+
+sub remove_schedule_rule_remove_schedule {
+	my ($self, $state, $update) = @_;
+	if ($self->is_transition($state)) {
+		undef;
+	} else {
+		FSMUtils::_with_text($update, sub {
+			my ($key) = @_;
+			my $instructor = $self->{instructor};
+			my $schedule = $self->{resources}->schedule($instructor);
+			my $data = %{_schedule_keyboard($schedule)}{$key};
+			$self->{resources}->remove($instructor, $data->{resource}, $data->{span});
+		});
+		1;
+	}
 }
 
 ################################################################################
