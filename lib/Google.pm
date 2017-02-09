@@ -69,4 +69,17 @@ sub insert {
 	$api->add_event($user, $calendar, $event);
 }
 
+sub delete {
+	my ($calendar, $event) = @_;
+
+	Google::CalendarAPI::_refresh_token;
+
+	my $url = "https://www.googleapis.com/calendar/v3/calendars/";
+	$gapi->api_query({
+		method => "delete",
+		route =>  $url . $calendar . "/events/" . $event,
+		user => $user
+	});
+}
+
 1;

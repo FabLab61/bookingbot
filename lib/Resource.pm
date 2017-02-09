@@ -43,8 +43,6 @@ sub vacancies {
 sub schedule {
 	my ($self, $instructor, $span) = @_;
 
-	my $dtf = $self->{dtf};
-
 	my $events = Google::CalendarAPI::Events::list($self->{calendar}, $span);
 
 	my @free = map { $_->{span} }
@@ -55,6 +53,27 @@ sub schedule {
 		grep { not $_->{transparent} } @$events;
 
 	ScheduleUtils::schedule(\@free, \@busy);
+}
+
+sub delete {
+	my ($self, $instructor, $span) = @_;
+
+	my $events = Google::CalendarAPI::Events::list($self->{calendar}, $span);
+
+	my @busy = grep { $_->{span}->contains($span) }
+		grep { not $_->{transparent} } @$events;
+
+	foreach my $event (@busy) {
+		$self->record($instructor, $event->{span});
+	}
+
+	my @free = grep { $_->{span}->contains($span) }
+		grep { $_->{summary} eq $instructor }
+		grep { $_->{transparent} } @$events;
+
+	if (scalar @free) {
+		Google::CalendarAPI::Events::delete($self->{calendar}, @free[0]->{id});
+	}
 }
 
 sub book {
