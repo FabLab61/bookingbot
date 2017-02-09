@@ -47,21 +47,14 @@ sub schedule {
 
 	my $events = Google::CalendarAPI::Events::list($self->{calendar}, $span);
 
-	my @free = grep { $_->{summary} eq $instructor }
+	my @free = map { $_->{span} }
+		grep { $_->{summary} eq $instructor }
 		grep { $_->{transparent} } @$events;
 
-	my @busy = grep {
-		my $span = $_->{span};
-		my @result = grep { $_->{span}->contains($span) } @free;
-		scalar @result;
+	my @busy = map { $_->{span} }
+		grep { not $_->{transparent} } @$events;
 
-	} grep { not $_->{transparent} } @$events;
-
-	my @result = map { {span => $_->{span}, busy => not $_->{transparent}} }
-		sort { $dtf->cmp($a->{span}->start, $b->{span}->start) }
-		(@free, @busy);
-
-	\@result;
+	ScheduleUtils::schedule(\@free, \@busy);
 }
 
 sub book {
