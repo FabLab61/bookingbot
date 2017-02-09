@@ -31,7 +31,7 @@ sub share_contact {
 	my ($self, $chat_id) = @_;
 
 	$self->{api}->send_message({chat_id => $chat_id,
-		text => lz("instructor_contact")});
+		text => lz("user_instructor_contact")});
 
 	try {
 		$self->{api}->send_contact({chat_id => $chat_id, contact => {
