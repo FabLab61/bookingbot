@@ -31,10 +31,11 @@ sub vacancies {
 		scalar @result ? $result[0] : undef;
 	}
 
+	my $vacancies = ScheduleUtils::vacancies(\@free, \@busy, $duration);
 	my @result = map {{
 		span => $_,
 		instructor => _enclosing_event($events, $_)->{summary}
-	}} ScheduleUtils::vacancies(\@free, \@busy, $duration);
+	}} @{$vacancies};
 
 	\@result;
 }
