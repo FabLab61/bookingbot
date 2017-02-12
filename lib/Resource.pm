@@ -60,19 +60,21 @@ sub remove {
 
 	my $events = Google::CalendarAPI::Events::list($self->{calendar}, $span);
 
-	my @busy = grep { $_->{span}->contains($span2remove) }
-		grep { not $_->{transparent} } @$events;
-
-	foreach my $event (@busy) {
-		$self->record($instructor, $event->{span});
-	}
-
 	my @free = grep { $_->{span}->contains($span2remove) }
 		grep { $_->{summary} eq $instructor }
 		grep { $_->{transparent} } @$events;
 
 	if (scalar @free) {
-		Google::CalendarAPI::Events::delete($self->{calendar}, $free[0]->{id});
+		my $event = $free[0];
+
+		my @busy = grep { $event->{span}->contains($_->{span}) }
+			grep { not $_->{transparent} } @$events;
+
+		foreach my $e (@busy) {
+			$self->record($instructor, $e->{span});
+		}
+
+		Google::CalendarAPI::Events::delete($self->{calendar}, $event->{id});
 	}
 }
 
