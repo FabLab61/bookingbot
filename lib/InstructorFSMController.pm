@@ -144,7 +144,8 @@ sub schedule_remove_rule_schedule_remove_done {
 			my ($key) = @_;
 			my $instructor = $self->{instructor};
 			my $schedule = $self->{resources}->schedule($instructor);
-			my $data = %{_schedule_keyboard($schedule)}{$key};
+			my $keyboard = _schedule_keyboard($schedule);
+			my $data = $keyboard->{$key};
 			$self->{resources}->remove($instructor, $data->{resource}, $data->{span});
 		});
 		1;
