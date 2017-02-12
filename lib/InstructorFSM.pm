@@ -79,9 +79,9 @@ sub new {
 			TIME => {
 				do => sub { $ctrl->do_time(@_); },
 				rules => [
+					RESOURCE => sub { $ctrl->time_rule_resource(@_); },
 					CANCEL => sub { $ctrl->time_rule_cancel(@_); },
 					RECORD => sub { $ctrl->time_rule_record(@_); },
-					RESOURCE => sub { $ctrl->time_rule_resource(@_); },
 					TIME_FAILED => 1
 				],
 			},

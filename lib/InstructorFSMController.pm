@@ -219,6 +219,11 @@ sub do_time {
 	$self->send_keyboard(lz("instructor_enter_time"), \@keyboard);
 }
 
+sub time_rule_resource {
+	my ($self, $state, $update) = @_;
+	$self->rule_back($state, $update);
+}
+
 sub time_rule_cancel {
 	my ($self, $state, $update) = @_;
 	$self->rule_cancel($state, $update);
@@ -231,11 +236,6 @@ sub time_rule_record {
 			$self->{recordtimeparser}->parse(shift);
 		}, shift);
 	});
-}
-
-sub time_rule_resource {
-	my ($self, $state, $update) = @_;
-	$self->rule_back($state, $update);
 }
 
 ################################################################################
