@@ -93,7 +93,7 @@ sub do_schedule {
 }
 
 ################################################################################
-# REMOVE_SCHEDULE
+# SCHEDULE_REMOVE
 
 sub _schedule_keyboard {
 	my ($schedule) = @_;
@@ -114,7 +114,7 @@ sub _schedule_keyboard {
 	\%result;
 }
 
-sub do_remove_schedule {
+sub do_schedule_remove {
 	my ($self, $state) = @_;
 
 	my $instructor = $self->{instructor};
@@ -129,12 +129,12 @@ sub do_remove_schedule {
 	}
 }
 
-sub remove_schedule_rule_cancel {
+sub schedule_remove_rule_cancel {
 	my ($self, $state, $update) = @_;
 	$self->is_transition($state) ? undef : $self->rule_cancel($state, $update);
 }
 
-sub remove_schedule_rule_remove_schedule {
+sub schedule_remove_rule_schedule_remove {
 	my ($self, $state, $update) = @_;
 	if ($self->is_transition($state)) {
 		undef;

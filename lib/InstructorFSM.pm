@@ -39,14 +39,14 @@ sub new {
 
 			SCHEDULE => {
 				do => sub { $ctrl->do_schedule(@_); },
-				rules => [REMOVE_SCHEDULE => 1],
+				rules => [SCHEDULE_REMOVE => 1],
 			},
 
-			REMOVE_SCHEDULE => {
-				do => sub { $ctrl->do_remove_schedule(@_); },
+			SCHEDULE_REMOVE => {
+				do => sub { $ctrl->do_schedule_remove(@_); },
 				rules => [
-					CANCEL => sub { $ctrl->remove_schedule_rule_cancel(@_); },
-					REMOVE_SCHEDULE => sub { $ctrl->remove_schedule_rule_remove_schedule(@_); },
+					CANCEL => sub { $ctrl->schedule_remove_rule_cancel(@_); },
+					SCHEDULE_REMOVE => sub { $ctrl->schedule_remove_rule_schedule_remove(@_); },
 					MENU => 1
 				],
 			},
