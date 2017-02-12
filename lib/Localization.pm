@@ -61,7 +61,7 @@ my %strings = (
 		"instructor_start"                    => "Hello! I am booking bot",
 		"instructor_menu"                     => "What can I do for you?",
 		"instructor_show_schedule"            => "📒 Show my schedule",
-		"instructor_add_record"               => "➕ Add new record to the schedule",
+		"instructor_add_record"               => "➕ New record",
 		"instructor_schedule"                 => "OK, I'm going to send you the schedule in a moment",
 		"instructor_schedule_is_empty"        => "No records found in your schedule",
 		"instructor_remove_record"            => "♻️ You can remove free record by pressing correspond button",
@@ -72,7 +72,7 @@ my %strings = (
 		"instructor_select_resource"          => "Select resource that you'll operate",
 		"instructor_enter_time"               => "Enter time when you're available",
 		"instructor_invalid_time"             => "I didn't understand, sorry, try again, please",
-		"instructor_record_saved"             => "OK, record saved",
+		"instructor_record_saved"             => "OK, record(s) saved",
 		"instructor_new_book"                 => "Hi! I have received new book record for you, here is what I have:\nResource: %s\nBooked from %s to %s\nI will send you the user contact in a moment\nYour contact has been sent to the user already\nHave a nice day! 😊",
 
 		"group_new_book"                      => "Hi guys! I have received new book record for instructor %s (%s), here is what I have:\nResource: %s\nBooked from %s to %s\nI will post here the user contact in a moment\nThe instructor's contact has been sent to the user already\nHave a nice day! 😊",
@@ -140,7 +140,7 @@ my %strings = (
 		"instructor_select_resource"          => "Выбери оборудование с которым будешь работать",
 		"instructor_enter_time"               => "Введи время, в течение которого ты готов принимать заявки",
 		"instructor_invalid_time"             => "Это слишком сложно для меня, попробуй ещё раз",
-		"instructor_record_saved"             => "OK, запись сохранена в расписании",
+		"instructor_record_saved"             => "OK, добавил в расписание",
 		"instructor_new_book"                 => "Привет! Я получил новую заявку на бронирование твоего оборудования. Вот информация, которая у меня есть:\nОборудование: %s\nВремя брони: с %s до %s\nСейчас я пришлю контакты клиента\nТвои контакты уже отправлены\nХорошего дня! 😊",
 
 		"group_new_book"                      => "Всем привет! Я получил новую заявку на бронирование для инструктора %s (%s). Вот что я узнал:\nОборудование: %s\nВремя брони: с %s до %s\nСейчас я пришлю контакты клиента\nКонтакты инструктора уже отправлены клиенту\nВсем хорошего дня! 😊",

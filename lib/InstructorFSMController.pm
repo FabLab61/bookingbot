@@ -5,6 +5,7 @@ use warnings;
 
 use FSMUtils;
 use Localization qw(lz dt);
+use StringUtils;
 
 use parent ("BaseFSMController");
 
@@ -233,7 +234,11 @@ sub time_rule_record {
 	my ($self, $state, $update) = @_;
 	FSMUtils::_with_text($update, sub {
 		FSMUtils::_parse_value($state, sub {
-			$self->{recordtimeparser}->parse(shift);
+			my @strs = @{StringUtils::split(shift)};
+			my @spans = grep { defined $_ }
+				map { $self->{recordtimeparser}->parse($_) }
+				@strs;
+			scalar @spans == scalar @strs ? \@spans : undef;
 		}, shift);
 	});
 }
@@ -257,9 +262,11 @@ sub do_record {
 
 	my $machine = $state->machine;
 	my $resource = $machine->last_result("RESOURCE");
-	my $span = $machine->last_result("TIME");
+	my $spans = $machine->last_result("TIME");
 
-	$self->{resources}->record($instructor, $resource, $span);
+	foreach my $span (@$spans) {
+		$self->{resources}->record($instructor, $resource, $span);
+	}
 
 	$self->send_message(lz("instructor_record_saved"));
 }
