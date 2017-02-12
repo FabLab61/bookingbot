@@ -46,9 +46,14 @@ sub new {
 				do => sub { $ctrl->do_schedule_remove(@_); },
 				rules => [
 					CANCEL => sub { $ctrl->schedule_remove_rule_cancel(@_); },
-					SCHEDULE_REMOVE => sub { $ctrl->schedule_remove_rule_schedule_remove(@_); },
+					SCHEDULE_REMOVE_DONE => sub { $ctrl->schedule_remove_rule_schedule_remove_done(@_); },
 					MENU => 1
 				],
+			},
+
+			SCHEDULE_REMOVE_DONE => {
+				do => sub { $ctrl->do_schedule_remove_done(@_); },
+				rules => [SCHEDULE_REMOVE => 1],
 			},
 
 			RESOURCE => {

@@ -134,7 +134,7 @@ sub schedule_remove_rule_cancel {
 	$self->is_transition($state) ? undef : $self->rule_cancel($state, $update);
 }
 
-sub schedule_remove_rule_schedule_remove {
+sub schedule_remove_rule_schedule_remove_done {
 	my ($self, $state, $update) = @_;
 	if ($self->is_transition($state)) {
 		undef;
@@ -148,6 +148,14 @@ sub schedule_remove_rule_schedule_remove {
 		});
 		1;
 	}
+}
+
+################################################################################
+# SCHEDULE_REMOVE_DONE
+
+sub do_schedule_remove_done {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("instructor_record_removed"));
 }
 
 ################################################################################
