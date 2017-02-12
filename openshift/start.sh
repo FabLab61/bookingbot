@@ -10,9 +10,7 @@ cd $OPENSHIFT_REPO_DIR/bookingbot
 
 ln -sf bot.pl.json bot.json
 
-git stash
 git pull
-git stash pop
 
 cpanm -n -l $OPENSHIFT_DATA_DIR/perl5 --installdeps .
 
