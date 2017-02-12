@@ -8,3 +8,5 @@ sub trim {
 	$inputstr =~ s/^\s+|\s+$//g;
 	$inputstr;
 }
+
+1;
