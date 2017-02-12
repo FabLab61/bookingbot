@@ -5,6 +5,7 @@ use warnings;
 
 use Try::Tiny qw(try catch);
 
+use StringUtils;
 use Localization qw(lz);
 
 sub new {
@@ -25,9 +26,7 @@ sub fullname {
 	my $first_name = $contact->{first_name};
 	my $last_name = $contact->{last_name} // "";
 
-	my $result = "$first_name $last_name";
-	$result =~ s/^\s+|\s+$//g; # trim
-	$result;
+	StringUtils::trim("$first_name $last_name");
 }
 
 sub send {
