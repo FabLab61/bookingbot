@@ -87,9 +87,15 @@ sub new {
 				rules => [
 					RESOURCE => sub { $ctrl->time_rule_resource(@_); },
 					CANCEL => sub { $ctrl->time_rule_cancel(@_); },
+					TIME_HELP => sub { $ctrl->time_rule_time_help(@_); },
 					RECORD => sub { $ctrl->time_rule_record(@_); },
 					TIME_FAILED => 1
 				],
+			},
+
+			TIME_HELP => {
+				do => sub { $ctrl->do_time_help(@_); },
+				rules => [TIME => 1],
 			},
 
 			TIME_FAILED => {

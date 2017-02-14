@@ -240,7 +240,7 @@ sub do_resource_failed {
 
 sub do_time {
 	my ($self, $state) = @_;
-	my @keyboard = (lz("back"), lz("cancel"));
+	my @keyboard = (lz("help"), lz("back"), lz("cancel"));
 	$self->send_keyboard(lz("instructor_enter_time"), \@keyboard);
 }
 
@@ -254,6 +254,11 @@ sub time_rule_cancel {
 	$self->rule_cancel($state, $update);
 }
 
+sub time_rule_time_help {
+	my ($self, $state, $update) = @_;
+	$self->rule_help($state, $update);
+}
+
 sub time_rule_record {
 	my ($self, $state, $update) = @_;
 	FSMUtils::_with_text($update, sub {
@@ -265,6 +270,14 @@ sub time_rule_record {
 			scalar @spans == scalar @strs ? \@spans : undef;
 		}, shift);
 	});
+}
+
+################################################################################
+# TIME_HELP
+
+sub do_time_help {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("instructor_time_help"));
 }
 
 ################################################################################

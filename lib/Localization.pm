@@ -35,6 +35,7 @@ my %strings = (
 
 		"booked_by"                           => "Booked by %s",
 
+		"help"                                => "❓ Help",
 		"back"                                => "⬅️ Back",
 		"cancel"                              => "❌ Cancel",
 		"operation_cancelled"                 => "❌ Operation cancelled",
@@ -72,6 +73,7 @@ my %strings = (
 		"instructor_resource_not_found"       => "No available resources found, sorry. It looks like a bug, inform my admin, please",
 		"instructor_select_resource"          => "Select resource that you'll operate",
 		"instructor_enter_time"               => "Enter time when you're available",
+		"instructor_time_help"                => "Following formats are available:\n1⃣ \"tomorrow from 8.15 to 9.45\" (you can separate minutes with dot, dash or colon)\n2⃣ \"at monday from 10-20 to 17-35\" (record at next monday)\n3⃣ \"at tue from 15 to 19-15\" (minutes can be ommited)\n4⃣ \"sat from 11.10 to 19\" (week days can be shortened to 3 characters, day preposition could be ommited)\n5⃣ \"at wednesday from 9.30\" (record until the end of the working day)\n6⃣ \"friday after 16\" (until the end of the working day)\n7⃣ \"sunday until 14\" (from the begin of the working day)\n8⃣ \"mon at 10:30\" (\"at\" preposition means record for 1 hour, until 11:30 in this case)\n\nYou can add multiple records like \"mon from 12 to 20, tue from 13 to 17\". Records are separated with a comma or a new line.\n\nWarning: this feature is not tested well for English language. If you find any bugs, please, let developers know. Thanks!",
 		"instructor_invalid_time"             => "I didn't understand, sorry, try again, please",
 		"instructor_record_saved"             => "OK, record(s) saved",
 		"instructor_new_book"                 => "Hi! I have received new book record for you, here is what I have:\nResource: %s\nBooked from %s to %s\nI will send you the user contact in a moment\nYour contact has been sent to the user already\nHave a nice day! 😊",
@@ -104,6 +106,7 @@ my %strings = (
 
 		"booked_by"                           => "Забронировал %s",
 
+		"help"                                => "❓ Справка",
 		"back"                                => "⬅️ Назад",
 		"cancel"                              => "❌ Отмена",
 		"operation_cancelled"                 => "❌ Операция отменена",
@@ -141,6 +144,7 @@ my %strings = (
 		"instructor_resource_not_found"       => "Не найдено доступное оборудование. Это похоже на программную ошибку, пожалуйста, сообщите моему администратору",
 		"instructor_select_resource"          => "Выбери оборудование с которым будешь работать",
 		"instructor_enter_time"               => "Введи время, в течение которого ты готов принимать заявки",
+		"instructor_time_help"                => "Возможны следующие форматы времени:\n1⃣ \"завтра с 8.15 до 9.45\" (минуты отделяются точкой, тире или двоеточием)\n2⃣ \"в понедельник с 10-20 до 17-35\" (запись в следующий понедельник)\n3⃣ \"во вт с 15 до 19-50\" (минуты могут быть не указаны)\n4⃣ \"сб с 11.10 до 19\" (предлог дня недели может отсутствовать, дни недели сокращаются до 2 букв)\n5⃣ \"в среду с 9.30\" (запись до конца рабочего дня)\n6⃣ \"пятница после 16\" (до конца рабочего дня)\n7⃣ \"вс до 14\" (с начала рабочего дня)\n8⃣ \"пн в 10:30\" (предлог \"в\" означает запись на 1 час, до 11:30 в данном случае)\n\nЗаписи могут добавляться \"пачкой\", например \"пн с 12 до 20, вт с 13 до 17\". В этом случае записи разделяются запятой или переводом строки.",
 		"instructor_invalid_time"             => "Это слишком сложно для меня, попробуй ещё раз",
 		"instructor_record_saved"             => "OK, добавил в расписание",
 		"instructor_new_book"                 => "Привет! Я получил новую заявку на бронирование твоего оборудования. Вот информация, которая у меня есть:\nОборудование: %s\nВремя брони: с %s до %s\nСейчас я пришлю контакты клиента\nТвои контакты уже отправлены\nХорошего дня! 😊",

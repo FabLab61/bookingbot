@@ -66,4 +66,9 @@ sub rule_cancel {
 	FSMUtils::_with_text($update, sub { shift eq lz("cancel"); });
 }
 
+sub rule_help {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub { shift eq lz("help"); });
+}
+
 1;
