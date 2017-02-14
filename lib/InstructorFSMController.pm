@@ -115,6 +115,14 @@ sub _schedule_keyboard {
 	\%result;
 }
 
+sub _schedule_item {
+	my ($self, $text) = @_;
+	my $instructor = $self->{instructor};
+	my $schedule = $self->{resources}->schedule($instructor);
+	my $keyboard = _schedule_keyboard($schedule);
+	$keyboard->{$text};
+}
+
 sub do_schedule_remove {
 	my ($self, $state) = @_;
 
@@ -135,21 +143,36 @@ sub schedule_remove_rule_cancel {
 	$self->is_transition($state) ? undef : $self->rule_cancel($state, $update);
 }
 
+sub schedule_remove_rule_schedule_remove_failed {
+	my ($self, $state, $update) = @_;
+	FSMUtils::_with_text($update, sub {
+		my $item = $self->_schedule_item(shift);
+		!$self->is_transition($state) && !defined $item;
+	});
+}
+
 sub schedule_remove_rule_schedule_remove_done {
 	my ($self, $state, $update) = @_;
 	if ($self->is_transition($state)) {
 		undef;
 	} else {
 		FSMUtils::_with_text($update, sub {
-			my ($key) = @_;
-			my $instructor = $self->{instructor};
-			my $schedule = $self->{resources}->schedule($instructor);
-			my $keyboard = _schedule_keyboard($schedule);
-			my $data = $keyboard->{$key};
-			$self->{resources}->remove($instructor, $data->{resource}, $data->{span});
+			my $item = $self->_schedule_item(shift);
+			$self->{resources}->remove(
+				$self->{instructor},
+				$item->{resource},
+				$item->{span});
 		});
 		1;
 	}
+}
+
+################################################################################
+# SCHEDULE_REMOVE_FAILED
+
+sub do_schedule_remove_failed {
+	my ($self, $state) = @_;
+	$self->transition($state, lz("instructor_invalid_record"));
 }
 
 ################################################################################
