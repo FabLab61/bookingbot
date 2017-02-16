@@ -1,6 +1,7 @@
 requires "API::Google";
 requires "common::sense";
 requires "Data::Dumper";
+requires "Data::Dumper::AutoEncode";
 requires "Date::Parse";
 requires "DateTime";
 requires "DateTime::Duration";
