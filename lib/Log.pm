@@ -2,6 +2,7 @@ package Log;
 
 use strict;
 use warnings;
+use utf8;
 
 use Log::Any ();
 use Log::Any::Adapter ('Stdout');

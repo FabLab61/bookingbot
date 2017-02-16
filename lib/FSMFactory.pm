@@ -2,6 +2,7 @@ package FSMFactory;
 
 use strict;
 use warnings;
+use utf8;
 
 use Contacts;
 use DateTimeFactory;

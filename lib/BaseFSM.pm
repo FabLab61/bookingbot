@@ -2,6 +2,7 @@ package BaseFSM;
 
 use strict;
 use warnings;
+use utf8;
 
 sub next {
 	my ($self, $update) = @_;

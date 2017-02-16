@@ -2,6 +2,10 @@
 
 package BookingBot;
 
+use strict;
+use warnings;
+use utf8;
+
 use common::sense;
 use File::Basename qw(dirname);
 use Mojolicious::Lite;

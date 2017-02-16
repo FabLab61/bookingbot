@@ -2,6 +2,7 @@ package Instructor;
 
 use strict;
 use warnings;
+use utf8;
 
 use Try::Tiny qw(try catch);
 

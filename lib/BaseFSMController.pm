@@ -2,6 +2,7 @@ package BaseFSMController;
 
 use strict;
 use warnings;
+use utf8;
 
 use Localization qw(lz);
 

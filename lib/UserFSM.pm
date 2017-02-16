@@ -2,6 +2,7 @@ package UserFSM;
 
 use strict;
 use warnings;
+use utf8;
 
 use FSA::Rules;
 

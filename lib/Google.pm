@@ -1,10 +1,10 @@
 package Google;
 
-
 package Google::CalendarAPI;
 
 use strict;
 use warnings;
+use utf8;
 
 use API::Google::GCal;
 

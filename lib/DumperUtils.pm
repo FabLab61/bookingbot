@@ -2,6 +2,7 @@ package DumperUtils;
 
 use strict;
 use warnings;
+use utf8;
 
 sub span2str {
 	my ($span) = @_;

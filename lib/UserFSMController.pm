@@ -2,6 +2,7 @@ package UserFSMController;
 
 use strict;
 use warnings;
+use utf8;
 
 use FSMUtils;
 use Localization qw(lz dt);

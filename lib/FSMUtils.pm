@@ -2,6 +2,7 @@ package FSMUtils;
 
 use strict;
 use warnings;
+use utf8;
 
 sub _with_text {
 	my ($update, $callback) = @_;

@@ -2,6 +2,7 @@ package RecordTimeParser;
 
 use strict;
 use warnings;
+use utf8;
 
 use Localization qw(lz);
 

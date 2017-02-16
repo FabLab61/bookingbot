@@ -2,6 +2,7 @@ package Instructors;
 
 use strict;
 use warnings;
+use utf8;
 
 use Instructor;
 use Localization qw(lz dt);

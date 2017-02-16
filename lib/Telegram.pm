@@ -1,10 +1,10 @@
 package Telegram;
 
-
 package Telegram::BotAPI;
 
 use strict;
 use warnings;
+use utf8;
 
 use Try::Tiny qw(try catch);
 use WWW::Telegram::BotAPI;

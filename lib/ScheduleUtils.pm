@@ -2,6 +2,7 @@ package ScheduleUtils;
 
 use strict;
 use warnings;
+use utf8;
 
 use DateTimeFactory;
 
