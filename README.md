@@ -56,25 +56,12 @@ Configuration file named `bot.pl.json` and has following structure (comments sep
 
 ## Usage
 
-1. Register your instructors in `bot.pl.json`.
-2. Let instructors add their schedule to resources' calendars. Here is some rules they have to follow:
+1. Register your instructors in `bot.pl.json` and run the bot.
 
-    - instructors must use their human-readable id (see *Configuration* section) as summary for their events;
-    - instructors' schedules for particular resource should not intersect each other;
-    - instructors' events must be marked as AVAILABLE. *BUSY events will be treated as booked and its time will be removed from resources schedule!*
+1. The bot will notify registered instructors when someone book resource in their schedule, so instructors have to open a chat with bot and send `/start` command to it (Telegram bots can't write to humans first). Instructors can create or remove records in their schedules using the bot (every record will be synced with Google Calendar of the resource).
 
-3. When instructors' schedule added to the calendars you could start the bot.
-
-4. Right after `/start` command the bot will request to share your contact - this is required to book resources, so open menu in right up corner and select `Share my contact`. You are available to book resources now.
-
-5. The bot will notify registered instructors when someone book resources in their schedule, so instructors has to open chat with bot and send `/start` command to it (Telegram bot can't start new chat on their own).
-
-6. You could add the bot to any Telegram group and it will post information about every book he received. This could be useful for common instructors group.
-
-## Known issues
-
-If you have found any issue or have feature request - create an issue for it, please. Thanks.
+1. You can add the bot to any Telegram group and it will post information about every book he received. This could be useful for common instructors group.
 
 ## Contacts
 
-[Join us](https://t.me/joinchat/AAAAAAkdgZL7if9p7nvqGw) in Telegram.
+[Join us](https://t.me/joinchat/AAAAAAkdgZL7if9p7nvqGw) in Telegram (use English and Russian language, please). Questions, feature and pull requests are welcome!
