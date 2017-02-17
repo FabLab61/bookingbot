@@ -74,3 +74,7 @@ Configuration file named `bot.pl.json` and has following structure (comments sep
 ## Known issues
 
 If you have found any issue or have feature request - create an issue for it, please. Thanks.
+
+## Contacts
+
+[Join us](https://t.me/joinchat/AAAAAAkdgZL7if9p7nvqGw) in Telegram.
