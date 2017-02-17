@@ -67,4 +67,4 @@ Configuration file named `bot.pl.json` and has following structure (comments sep
 
 ## Contacts
 
-[Join us](https://t.me/joinchat/AAAAAAkdgZL7if9p7nvqGw) in Telegram (use English and Russian language, please). Questions, feature and pull requests are welcome!
+[Join us](https://t.me/joinchat/AAAAAAkdgZL7if9p7nvqGw) in Telegram (use English or Russian language, please). Questions, feature and pull requests are welcome!
