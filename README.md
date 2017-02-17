@@ -26,13 +26,16 @@ Configuration file named `bot.pl.json` and has following structure (comments sep
 {
 	"token": "<...>",                      # Telegram Bot API token.
 
-	"language": "Russian",                 # Optional. Bot default language (supported values: English, Russian). English used if omitted.
+	"language": "Russian",                 # Optional. Bot default language
+	                                       # Supported values: "English" (default), "Russian".
 	"timezone": "Europe/Moscow",           # Bot time zone.
-	"workinghours": "08:00-00:00",         # Working hours of your organization in format HH:MM-HH-MM (24 hours).
+	"workinghours": "08:00-00:00",         # Working hours of your organization
+	                                       # in format HH:MM-HH-MM (24 hours).
 
 	"resources": {
 		"CTC 3D printer": {                # Human-readable name of resource.
-			"calendar": "primary"          # Resource's calendar id ("primary" for primary account calendar).
+			"calendar": "primary"          # Resource's calendar id ("primary"
+	                                       # for primary account calendar).
 		},
 	},
 
@@ -44,7 +47,7 @@ Configuration file named `bot.pl.json` and has following structure (comments sep
 	},
 
 	"instructors": {                       # List of registered instructors.
-		"email@example.com": {             # Human-readable instructor id (username, email - whatever).
+		"email@example.com": {             # Human-readable instructor id (username, email, etc.).
 			"id": "123456789",             # Instructor's Telegram user id.
 			"phone_number": "12345678901", # Instructor's phone number
 			"first_name": "Neil",          # and name.
