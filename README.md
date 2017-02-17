@@ -13,7 +13,7 @@
 
 1. Clone the repository.
 1. Put Google Authenticate file into repo dir. Rename it to `gapi.conf`.
-1. Open `bot.pl` in text editor and replace Telegram token with yours.
+1. Replace Telegram token with yours in configuration file (see `Configuration` section below).
 1. Run `dockerctl.sh` (you have to be `root` or member of `docker` group). It will take some time to download Docker images and Perl modules.
 
 _Run `dockerctl.sh help` for more run options._
