@@ -7,7 +7,7 @@
 ### Requirements
 
 1. Docker 1.6.2 or above.
-1. Google Authenticate file. Check [this instruction](https://bitbucket.org/serikov/google-apis-perl) to create it.
+1. Google Authenticate file. Check [this instruction](https://github.com/FabLab61/bookingbot/wiki/Google-Authenticate-file) to create it.
 
 ### Steps
 
