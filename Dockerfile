@@ -6,8 +6,7 @@ WORKDIR /usr/src/bookingbot
 
 COPY cpanfile ./
 
-RUN cpanm --installdeps . \
-	&& git clone https://bitbucket.org/serikov/serikoff.lib.git
+RUN cpanm --installdeps --verbose --self-upgrade . \
 
 COPY . .
 

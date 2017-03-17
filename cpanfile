@@ -20,3 +20,5 @@ requires "TAP::Harness";
 requires "Test::MockObject";
 requires "Try::Tiny";
 requires "WWW::Telegram::BotAPI";
+requires "Telegram::BotKit::Polling";
+requires "Telegram::BotKit::Keyboards";
