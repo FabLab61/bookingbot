@@ -47,7 +47,7 @@ while (1) {
 				or not defined $update->{message}
 				or not defined $update->{message}->{from}) {
 			$log->infof("unknown update - ignored");
-		} elsif ($chat_id ne $update->{message}->{from}->{id}) {
+		} elsif ($chat_id ne $update->{message}->{from}->{id}) {  # message comes from group chat
 			if (defined $update->{message}->{new_chat_participant}
 					or defined $update->{message}->{left_chat_participant}) {
 				$groups->process($update->{message});
@@ -60,12 +60,14 @@ while (1) {
 			$log->infof("new message: %s", $update->{message});
 
 			if (not exists $machines{$chat_id}) {
-				$machines{$chat_id} = $fsmfactory->create($user, $chat_id);
-				$log->infof("finite state machine created");
+				$machines{$chat_id} = $fsmfactory->create($user, $chat_id); # InstructorFSM or UserFSM instance. Resolved by FSMFactory::create()
+				# InstructorFSM or UserFSM instance both depends on BaseFSM
+				$log->infof("finite state machine for chat id #".$chat_id." created");
 			}
 
 			$machines{$chat_id}->next($update);
 			$log->infof("moved to next state");
+			$log->infof("last states: %s", $machines{$chat_id}->debug_states);
 		}
 
 		$log->infof("message processing finished");
