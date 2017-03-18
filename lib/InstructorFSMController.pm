@@ -54,8 +54,17 @@ sub do_menu {
 	$self->send_keyboard(lz("instructor_menu"), \@keyboard);
 }
 
+=method silent_menu_rule_schedule
+
+Return true if text from update is equal to instructor_show_schedule in needed locale
+
+Can also return undef if update is not good structure
+
+=cut 
+
 sub silent_menu_rule_schedule {
 	my ($self, $state, $update) = @_;
+	warn $update->{message}{text}; # must be "📒 Show my schedule"   ð Show my schedule
 	FSMUtils::_with_text($update, sub { shift eq lz("instructor_show_schedule"); });
 }
 

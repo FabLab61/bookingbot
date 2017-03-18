@@ -39,6 +39,10 @@ case $COMMAND in
 	docker run -it --rm --name bookingbot --entrypoint /bin/bash fablab/bookingbot
 	;;
 
+	stop)
+	docker stop bookingbot
+	;;
+
 	*)
 	echo "Unknown command: $COMMAND" >&2
 	echo "Usage: $0 [command]" >&2

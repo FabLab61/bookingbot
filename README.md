@@ -65,6 +65,25 @@ Configuration file named `bot.pl.json` and has following structure (comments sep
 
 1. You can add the bot to any Telegram group and it will post information about every book he received. This could be useful for common instructors group.
 
+## Software architecture
+
+Bot creates a finite state machine when user send first message
+
+Based on user role InstructorFSM or UserFSM object instance was created. 
+
+Decision made by FSMFactory::create() functon.
+
+Both finite state machines are objects of FSA::Rules class.
+
+FSA::Rules uses named states so that it's easy to tell what state you're in and what state you want to go to
+
+Also BaseFSM provide common methods for InstructorFSM or UserFSM
+
+When creating InstructorFSM and UserFSM objects are accepting as parameter name of class, methods from what will be used in do() and rules() subroutines of FSA::Rules
+
+
+
+
 ## Contacts
 
 [Join us](https://t.me/joinchat/AAAAAAkdgZL7if9p7nvqGw) in Telegram (use English or Russian language, please). Questions, feature and pull requests are welcome!

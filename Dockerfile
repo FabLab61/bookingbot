@@ -6,7 +6,7 @@ WORKDIR /usr/src/bookingbot
 
 COPY cpanfile ./
 
-RUN cpanm --installdeps --verbose --self-upgrade . \
+RUN cpanm --installdeps .
 
 COPY . .
 

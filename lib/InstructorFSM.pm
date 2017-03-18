@@ -30,6 +30,7 @@ sub new {
 				rules => [SILENT_MENU => 1],
 			},
 
+			# awaiting user choice
 			SILENT_MENU => {
 				rules => [
 					SCHEDULE => sub { $ctrl->silent_menu_rule_schedule(@_); },
