@@ -1,16 +1,18 @@
-# File for auto building of pavelsr/bookingbot image
+# File for auto building of pavelsr/bookingbot-dev image
+# Run container with
+# docker run --rm --name bookingbot -v $(pwd):/bookingbot pavelsr/bookingbot-dev
 
 FROM perl:5.24.0
-
-WORKDIR /bookingbot
-VOLUME ["/bookingbot"]
 
 COPY cpanfile ./
 
 RUN cpanm --installdeps .
+RUN rm cpanfile
+
+WORKDIR /bookingbot
+
+VOLUME ["/bookingbot"]
 
 ENTRYPOINT ["perl"]
-
-CMD ["bot.pl"]
 
 LABEL maintainer "Pavel Serikov <pavelsr@cpan.org>"
