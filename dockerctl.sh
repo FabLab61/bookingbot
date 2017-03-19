@@ -15,8 +15,8 @@ COMMAND=${1:-run}
 
 case $COMMAND in
 	run)
-	build
-	docker run --rm --name bookingbot fablab/bookingbot bot.pl
+	#docker run --rm --name bookingbot fablab/bookingbot bot.pl
+	docker run --rm --name bookingbot -v $(pwd):/bookingbot pavelsr/bookingbot-dev
 	;;
 
 	watch)

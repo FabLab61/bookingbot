@@ -23,6 +23,8 @@ $| = 1; # disable buffering
 
 my $jsonconfig = plugin "JSONConfig";
 
+warn "bot started";
+
 DateTimeFactory::set_default_timezone($jsonconfig->{timezone});
 Localization::set_language($jsonconfig->{language});
 
