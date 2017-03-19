@@ -1,6 +1,6 @@
 package BaseFSMController;
 
-use Mojo::Base -strict;
+use Mojo::Base -base;
 use Localization qw(lz);
 
 has 'chat_id';

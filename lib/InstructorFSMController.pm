@@ -1,28 +1,31 @@
 package InstructorFSMController;
 
-use strict;
-use warnings;
-use utf8;
+use Mojo::Base 'BaseFSMController';
 
 use FSMUtils;
 use Localization qw(lz dt);
 use StringUtils;
+use Log;
 
-use parent ("BaseFSMController");
+# inherited parameters from BaseFSMController - need to declare or creted automatically?
+# has 'chat_id';
+# has 'api';
 
-sub new {
-	my ($class, $user,
-		$chat_id, $api,
-		$instructors, $resources, $recordtimeparser) = @_;
+# passed parameters - need to declare or creted automatically ? 
+# has 'user';
+# has 'instructors';
+# has 'resources'; # instead of $self->{resources} = $resources;
+# has 'recordtimeparser'; 
 
-	my $self = $class->SUPER::new($chat_id, $api);
-	$self->{instructor} = $instructors->name($user->{id});
-	$self->{resources} = $resources;
-	$self->{recordtimeparser} = $recordtimeparser;
-	$self->{log} = Log->new("instructorfsmcontroller");
+## methods that are depends on initial parameters
+has 'instructor' => sub { 
+	InstructorFSMController->attr('instructors')->name(
+		InstructorFSMController->attr('instructors')->{id}) 
+};
 
-	$self;
-}
+has 'log' => Log->new("instructorfsmcontroller");
+
+
 
 ################################################################################
 # START

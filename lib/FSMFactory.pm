@@ -51,12 +51,12 @@ sub create {
 sub instructor_fsm {
 	my ($self, $user, $chat_id) = @_;
 	InstructorFSM->new(InstructorFSMController->new(
-			$user,
-			$chat_id,
-			$self->{api},
-			$self->{instructors},
-			$self->{resources},
-			$self->{recordtimeparser}));
+			user => $user,
+			chat_id => $chat_id,
+			api => $self->{api},
+			instructors => $self->{instructors},
+			resources => $self->{resources},
+			recordtimeparser => $self->{recordtimeparser}));
 }
 
 sub user_fsm {
