@@ -18,6 +18,15 @@ sub new {
 	bless $self, $class;
 }
 
+=method transition
+
+Depends on current $state (type = L<FSA::Rules> object) and income $message (type = string)
+
+L<https://metacpan.org/pod/FSA::Rules#message1>
+
+
+=cut
+
 sub transition {
 	my ($self, $state, $message) = @_;
 	$state->message("transition");

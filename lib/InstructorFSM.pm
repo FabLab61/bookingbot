@@ -10,6 +10,13 @@ use FSMUtils;
 
 use parent ("BaseFSM");
 
+=method new
+
+Accept as parameter new object that contains all needed methods
+
+=cut
+
+
 sub new {
 	my ($class, $ctrl) = @_;
 
@@ -26,6 +33,7 @@ sub new {
 			},
 
 			MENU => {
+				label => "My schedule and New event",
 				do => sub { $ctrl->do_menu(@_); },
 				rules => [SILENT_MENU => 1],
 			},

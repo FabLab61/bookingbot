@@ -10,19 +10,26 @@ use StringUtils;
 
 use parent ("BaseFSMController");
 
+use Data::Dumper;
+
 sub new {
 	my ($class, $user,
 		$chat_id, $api,
 		$instructors, $resources, $recordtimeparser) = @_;
 
 	my $self = $class->SUPER::new($chat_id, $api);
-	$self->{instructor} = $instructors->name($user->{id});
+	$self->{instructor} = $instructors->name($user->{id});  ## instructor ID. now it's GMail address.
 	$self->{resources} = $resources;
 	$self->{recordtimeparser} = $recordtimeparser;
 	$self->{log} = Log->new("instructorfsmcontroller");
 
 	$self;
 }
+
+
+
+# All first $state arguments are FSA::State object
+
 
 ################################################################################
 # START
@@ -60,6 +67,8 @@ Return true if text from update is equal to instructor_show_schedule in needed l
 
 Can also return undef if update is not good structure
 
+Needed to hide menu keyboard
+
 =cut 
 
 sub silent_menu_rule_schedule {
@@ -78,10 +87,18 @@ sub silent_menu_rule_resource {
 
 sub do_schedule {
 	my ($self, $state) = @_;
+	warn "Debug : ".(caller(0))[3]." params :".ref($state);
+
 	$self->transition($state, lz("instructor_schedule"));
 
 	my $instructor = $self->{instructor};
-	my $schedule = $self->{resources}->schedule($instructor);
+	my $schedule = $self->{resources}->schedule($instructor); # return of schedule() from Resource.pm. Return hash
+
+	# warn "Schedule : ".ref($schedule);
+	# warn "Instructor : ".ref($instructor);
+
+	warn "do_schedule() Instructor object".Dumper $instructor;
+	warn "do_schedule() schedule".Dumper  $schedule;
 
 	my $text = "";
 	foreach my $resource (sort { $a cmp $b } keys %$schedule) {

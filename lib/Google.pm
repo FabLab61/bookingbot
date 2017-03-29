@@ -1,5 +1,6 @@
 package Google;
 
+
 package Google::CalendarAPI;
 
 use strict;
@@ -32,18 +33,36 @@ sub _refresh_token {
 
 package Google::CalendarAPI::Events;
 
+use Data::Dumper;
+
 use strict;
 use warnings;
 
+
+=method list
+
+Accept google calendar_id and interval (span)
+
+Return an array of events
+
+=cut
+
 sub list {
 	my ($calendar, $span) = @_;
+
+	warn "".(caller(0))[3]."() : ".Dumper \@_; # return and a
+
 	$span = $span // $dtf->span_d($dtf->tomorrow, {days => 7});
 
 	Google::CalendarAPI::_refresh_token;
 
-	my @result = grep {
-		defined $_->{summary} and $span->contains($_->{span});
-	} map {{
+	warn "User: ".$user;
+
+	warn "Events list: ".Dumper \@{$api->events_list({calendarId => $calendar, user => $user})};
+
+	
+
+	my @i = map {{
 		id => $_->{id},
 		summary => $_->{summary},
 		transparent => ($_->{transparency} // "") eq "transparent",
@@ -51,6 +70,12 @@ sub list {
 			$dtf->parse_rfc3339($_->{start}->{dateTime}),
 			$dtf->parse_rfc3339($_->{end}->{dateTime})),
 	}} @{$api->events_list({calendarId => $calendar, user => $user})};
+
+	warn Dumper \@i;
+
+	my @result = grep { defined $_->{summary} and $span->contains($_->{span}) } @i;
+
+	warn "Result: ".Dumper \@result; # span field is DateTime::Span object
 
 	\@result;
 }

@@ -7,6 +7,18 @@ use utf8;
 use DateTimeFactory;
 use ScheduleUtils;
 use Google;
+use Data::Dumper;
+
+=method new
+
+Resource->new($record)
+
+$record - hash with calendar id property like
+
+{ "calendar": "GOOGLE_CAL_ID" }
+
+
+=cut 
 
 sub new {
 	my ($class, $record) = @_;
@@ -18,6 +30,7 @@ sub vacancies {
 	my ($self, $duration, $span) = @_;
 
 	my $events = Google::CalendarAPI::Events::list($self->{calendar}, $span);
+	warn "Events:".Dumper $events;
 
 	my @free = map { $_->{span} } grep { $_->{transparent} } @$events;
 	my @busy = map { $_->{span} } grep { not $_->{transparent} } @$events;
@@ -41,14 +54,26 @@ sub vacancies {
 	\@result;
 }
 
+
+=method schedule
+
+Obligatory parameter: instructor ID
+
+=cut
+
+
 sub schedule {
 	my ($self, $instructor, $span) = @_;
 
-	my $events = Google::CalendarAPI::Events::list($self->{calendar}, $span);
+	#warn "".(caller(0))[3]."() : ".Dumper $self;
+
+	my $events = Google::CalendarAPI::Events::list($self->{calendar}, $span); # self->{calendar} contains calendar id
+
+	warn "My events:". Dumper $events;
 
 	my @free = map { $_->{span} }
 		grep { $_->{summary} eq $instructor }
-		grep { $_->{transparent} } @$events;
+			grep { $_->{transparent} } @$events;
 
 	my @busy = map { $_->{span} }
 		grep { not $_->{transparent} } @$events;

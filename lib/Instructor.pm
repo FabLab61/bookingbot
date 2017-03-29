@@ -16,12 +16,11 @@ sub new {
 }
 
 sub id {
-	my ($self) = @_;
-	$self->{id};
+	shift->{id};
 }
 
 sub fullname {
-	my ($self) = @_;
+	my $self = shift;
 	my $first_name = $self->{first_name};
 	my $last_name = $self->{last_name} // "";
 	StringUtils::trim("$first_name $last_name");

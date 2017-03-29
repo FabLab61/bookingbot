@@ -5,23 +5,23 @@ use warnings;
 use utf8;
 
 sub _with_text {
-	my ($update, $callback) = @_;
-	defined $update
-		and defined $update->{message}
-		and defined $update->{message}->{text}
-		? $callback->($update->{message}->{text})
-		: undef
+    my ( $update, $callback ) = @_;
+    defined $update
+      and defined $update->{message}
+      and defined $update->{message}->{text}
+      ? $callback->( $update->{message}->{text} )
+      : undef;
 }
 
 sub _parse_value {
-	my ($state, $parser, @data) = @_;
+    my ( $state, $parser, @data ) = @_;
 
-	my $parsed = $parser->(@data);
-	if (defined $parsed) {
-		$state->result($parsed);
-	}
+    my $parsed = $parser->(@data);
+    if ( defined $parsed ) {
+        $state->result($parsed);
+    }
 
-	defined $parsed;
+    defined $parsed;
 }
 
 1;
