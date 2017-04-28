@@ -26,7 +26,7 @@ sub vacancies {
 		my ($events, $span) = @_;
 
 		my @result = grep {
-			$_->{transparent} and $_->{span}->contains($span);
+			$_->{transparent} && $_->{span}->contains($span);
 		} @$events;
 
 		scalar @result ? $result[0] : undef;
