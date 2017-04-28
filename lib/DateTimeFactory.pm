@@ -18,6 +18,9 @@ sub set_default_timezone {
 	$default_timezone = shift;
 }
 
+
+# can be DateTime::TimeZone or a string
+
 sub new {
 	my ($class, $timezone) = @_;
 	my $self = {timezone => $timezone // $default_timezone};
@@ -62,7 +65,7 @@ sub parse {
 
 sub parse_rfc3339 {
 	my ($self, $inputstr) = @_;
-	die unless defined $self->{timezone};
+	die "timezone isnt defined in dtf!" unless defined $self->{timezone};
 
 	my $result = DateTime::Format::RFC3339->parse_datetime($inputstr);
 	$result->set_time_zone($self->{timezone});
@@ -73,6 +76,18 @@ sub dur {
 	DateTime::Duration->new(%params);
 }
 
+=method durcmp
+
+$left and $right - DateTime::Duration objects
+
+$start - DateTime object. If no provided, DateTime->now will be used instead
+
+Return 1 if first duration is longer and -1 if second is longer
+
+See https://metacpan.org/pod/DateTime::Duration#DateTime::Duration-%3Ecompare(-$duration1,-$duration2,-$base_datetime-)
+
+=cut
+
 sub durcmp {
 	my ($self, $left, $right, $start) = @_;
 	DateTime::Duration->compare($left, $right, $start);
@@ -82,6 +97,15 @@ sub rfc3339 {
 	my ($self, $datetime) = @_;
 	DateTime::Format::RFC3339->format_datetime($datetime);
 }
+
+=method span_d
+
+Returns DateTime::Duration object created from DateTime and duration. Creates DateTime::Duration from data if it is not blessed object
+
+	$datetime - DateTime object.
+  $data - DateTime::Duration' object or hash forDateTime::Duration->new'.
+
+=cut
 
 sub span_d {
 	my ($self, $datetime, $data) = @_;

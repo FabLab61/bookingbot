@@ -1,35 +1,20 @@
 package Google;
 
-
-package Google::CalendarAPI;
+# ABSTRACT:
 
 use strict;
 use warnings;
 use utf8;
-
-use API::Google::GCal;
+use Moo::Google;
 
 use DateTimeFactory;
 
-my $api;
-my $user;
-my $dtf;
+my $gapi = Moo::Google->new;
+my $user = 'fablab61ru@gmail.com';
+$gapi->auth_storage->setup({type => 'jsonfile', path => 'gapi.conf' });
 
-sub auth {
-	my ($tokensfile, $user_) = @_;
-	$api = API::Google::GCal->new({tokensfile => $tokensfile});
-	$user = $user_;
-	$dtf = DateTimeFactory->new;
-}
 
-my $_expire;
-sub _refresh_token {
-	my $now = $dtf->now;
-	if (not defined $_expire or $dtf->cmp($_expire, $now) <= 0) {
-		$api->refresh_access_token_silent($user);
-		$_expire = $now->clone->add(minutes => 45);
-	}
-}
+
 
 package Google::CalendarAPI::Events;
 
@@ -43,7 +28,11 @@ use warnings;
 
 Accept google calendar_id and interval (span)
 
-Return an array of events
+Return a list of events with blessed into DateTime::Span start and end
+
+All events are checked for
+
+better to call ->events_inside_span
 
 =cut
 
@@ -52,7 +41,8 @@ sub list {
 
 	warn "".(caller(0))[3]."() : ".Dumper \@_; # return and a
 
-	$span = $span // $dtf->span_d($dtf->tomorrow, {days => 7});
+	$span = $span // $dtf->span_d($dtf->tomorrow, {days => 7}); # Logical Defined-Or
+	# return $dft if span isn't defined
 
 	Google::CalendarAPI::_refresh_token;
 
@@ -60,7 +50,7 @@ sub list {
 
 	warn "Events list: ".Dumper \@{$api->events_list({calendarId => $calendar, user => $user})};
 
-	
+
 
 	my @i = map {{
 		id => $_->{id},

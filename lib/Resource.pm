@@ -1,13 +1,23 @@
 package Resource;
 
+# ABSTRACT: Class for managing resources in Google Calendar
+
 use strict;
 use warnings;
 use utf8;
+use Data::Dumper;
 
 use DateTimeFactory;
 use ScheduleUtils;
-use Google;
-use Data::Dumper;
+use Moo::Google;
+use Hash::Slice qw/slice/;
+
+my $gapi = Moo::Google->new;
+my $user = 'fablab61ru@gmail.com';
+$gapi->auth_storage->setup({type => 'jsonfile', path => 'gapi.conf' });
+$gapi->user($user);
+$gapi->do_autorefresh(1);
+my $dtf = DateTimeFactory->new('Europe/Moscow');
 
 =method new
 
@@ -18,7 +28,7 @@ $record - hash with calendar id property like
 { "calendar": "GOOGLE_CAL_ID" }
 
 
-=cut 
+=cut
 
 sub new {
 	my ($class, $record) = @_;
@@ -26,32 +36,71 @@ sub new {
 	bless \%self, $class;
 }
 
+
+
+sub _enclosing_event {
+	my ($events, $span) = @_;
+
+	my @result = grep {
+		$_->{transparent} and $_->{span}->contains($span);
+	} @$events;
+
+	scalar @result ? $result[0] : undef;
+}
+
+
+
+
+sub events_inside_span { # instead of old Google::CalendarAPI::Events::list
+	my ($self, $span) = @_;
+	my $events = $gapi->Calendar->Events->list({ calendarId => $self->{calendar} })->json->{items}; # all
+	warn "Total events found in calendarId: ".scalar @$events;
+	# warn "Events".Dumper $events;
+	# filter events
+	my @i = map {{
+		id => $_->{id},
+		summary => $_->{summary},
+		transparent => ($_->{transparency} // "") eq "transparent",  # ?
+		span => $dtf->span_se(
+			$dtf->parse_rfc3339($_->{start}{dateTime}),
+			$dtf->parse_rfc3339($_->{end}{dateTime})),
+	}} @$events;   # more convenient representation for further comparision
+	warn "Spanified Event objects: ".Dumper \@i;
+	$span = $span // $dtf->span_d($dtf->tomorrow, {days => 7}); # DateTime::Duration from tomorrow till tomorrow plus week
+	my @result = grep { defined $_->{summary} && $span->contains($_->{span}) } @i; # like "is-fully-inside"
+	return \@result;
+}
+
+
+=method vacancies
+
+Search free timeslots with minimum $duration in specified interval ($span)
+
+	my $resource = Resource->new;
+	$resource->vacancies($duration, $span);
+
+Input format:
+
+$duration - L<DateTime::Duration> object
+
+$span - L<DateTime::Span> object
+
+Return ARRAY
+
+=cut
+
+
 sub vacancies {
 	my ($self, $duration, $span) = @_;
-
-	my $events = Google::CalendarAPI::Events::list($self->{calendar}, $span);
-	warn "Events:".Dumper $events;
-
+	my $events = $self->events_inside_span($span);
 	my @free = map { $_->{span} } grep { $_->{transparent} } @$events;
 	my @busy = map { $_->{span} } grep { not $_->{transparent} } @$events;
-
-	sub _enclosing_event {
-		my ($events, $span) = @_;
-
-		my @result = grep {
-			$_->{transparent} and $_->{span}->contains($span);
-		} @$events;
-
-		scalar @result ? $result[0] : undef;
-	}
-
 	my $vacancies = ScheduleUtils::vacancies(\@free, \@busy, $duration);
 	my @result = map {{
 		span => $_,
 		instructor => _enclosing_event($events, $_)->{summary}
-	}} @{$vacancies};
-
-	\@result;
+	}} @$vacancies;
+	return \@result;
 }
 
 
