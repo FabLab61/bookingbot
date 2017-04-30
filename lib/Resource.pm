@@ -2,12 +2,14 @@ package Resource;
 
 # ABSTRACT: Class for managing resources in Google Calendar
 
+# For more information about Google Calendar API please check
+
 use strict;
 use warnings;
 use utf8;
 use Data::Dumper;
 
-use DateTimeFactory;
+use DateTimeFactory;  # has only one attribute - timeZone
 use ScheduleUtils;
 use Moo::Google;
 use Hash::Slice qw/slice/;
@@ -48,6 +50,13 @@ sub _enclosing_event {
 	scalar @result ? $result[0] : undef;
 }
 
+=method events_inside_span
+
+	Return list of events into specified D
+
+	https://metacpan.org/pod/DateTime::Span
+
+=cut
 
 
 
@@ -100,6 +109,7 @@ sub vacancies {
 		span => $_,
 		instructor => _enclosing_event($events, $_)->{summary}
 	}} @$vacancies;
+	warn Dumper \@result;
 	return \@result;
 }
 
@@ -152,6 +162,12 @@ sub remove {
 		Google::CalendarAPI::Events::delete($self->{calendar}, $event->{id});
 	}
 }
+
+=method book
+
+
+=cut
+
 
 sub book {
 	my ($self, $summary, $span) = @_;
