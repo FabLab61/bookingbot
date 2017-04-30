@@ -58,7 +58,7 @@ sub new {
 
 
 sub _enclosing_event {
-	my ($events, $span) = @_;
+	my ($self, $events, $span) = @_;
 
 	my @result = grep {
 		$_->{transparent} && $_->{span}->contains($span);
@@ -135,7 +135,7 @@ sub vacancies {
 	my $vacancies = ScheduleUtils::vacancies(\@free, \@busy, $duration);
 	my @result = map {{
 		span => $_,
-		instructor => _enclosing_event($events, $_)->{summary}
+		instructor => $self->_enclosing_event($events, $_)->{summary}
 	}} @$vacancies;
 	warn Dumper \@result;
 	return \@result;
