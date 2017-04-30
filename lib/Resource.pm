@@ -14,6 +14,17 @@ sub new {
 	bless \%self, $class;
 }
 
+
+sub _enclosing_event {
+	my ($self, $events, $span) = @_;
+
+	my @result = grep {
+		$_->{transparent} && $_->{span}->contains($span);
+	} @$events;
+
+	scalar @result ? $result[0] : undef;
+}
+
 sub vacancies {
 	my ($self, $duration, $span) = @_;
 
@@ -22,20 +33,11 @@ sub vacancies {
 	my @free = map { $_->{span} } grep { $_->{transparent} } @$events;
 	my @busy = map { $_->{span} } grep { not $_->{transparent} } @$events;
 
-	sub _enclosing_event {
-		my ($events, $span) = @_;
-
-		my @result = grep {
-			$_->{transparent} && $_->{span}->contains($span);
-		} @$events;
-
-		scalar @result ? $result[0] : undef;
-	}
 
 	my $vacancies = ScheduleUtils::vacancies(\@free, \@busy, $duration);
 	my @result = map {{
 		span => $_,
-		instructor => _enclosing_event($events, $_)->{summary}
+		instructor => $self->_enclosing_event($events, $_)->{summary}
 	}} @{$vacancies};
 
 	\@result;
