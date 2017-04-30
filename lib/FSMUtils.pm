@@ -7,8 +7,8 @@ use utf8;
 sub _with_text {
     my ( $update, $callback ) = @_;
     defined $update
-      and defined $update->{message}
-      and defined $update->{message}->{text}
+      && defined $update->{message}
+      && defined $update->{message}->{text}
       ? $callback->( $update->{message}->{text} )
       : undef;
 }

@@ -10,7 +10,7 @@ sub next {
 	do {
 		$self->{fsa}->switch($update);
 		$last_message = $self->{fsa}->last_message;
-	} while (defined $last_message and $last_message eq "transition")
+	} while (defined $last_message && $last_message eq "transition")
 }
 
 =method debug

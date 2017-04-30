@@ -6,6 +6,7 @@ use utf8;
 use overload;
 
 use Data::Dumper::AutoEncode;
+use Data::Printer;
 use Log::Any ();
 use Log::Any::Adapter ('Stdout');
 use Log::Any::For::Std;

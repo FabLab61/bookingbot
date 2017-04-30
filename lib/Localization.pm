@@ -95,7 +95,7 @@ my %strings = (
 		"friday_re"                           => qr/(?:пт)|(?:пятниц(?:а|у))/i,
 		"saturday_re"                         => qr/(?:сб)|(?:суббот(?:а|у))/i,
 		"sunday_re"                           => qr/(?:вс)|(?:воскресенье)/i,
-		
+
 		"at_re"                               => qr/в/i,
 		"until_re"                            => qr/до/i,
 
@@ -166,7 +166,7 @@ sub set_language {
 	my ($new_language) = @_;
 
 	my $languages_ = languages;
-	my $result = defined $new_language and
+	my $result = defined $new_language &&
 		grep { $_ eq $new_language } @$languages_;
 	if ($result) {
 		$language = $new_language;

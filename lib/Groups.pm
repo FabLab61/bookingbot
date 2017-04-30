@@ -13,10 +13,10 @@ sub new {
 sub process {
 	my ($self, $message) = @_;
 	if (defined $message->{new_chat_participant}
-			and $message->{new_chat_participant}->{id} eq $self->{myid}) {
+			&& $message->{new_chat_participant}->{id} eq $self->{myid}) {
 		push @{$self->{groups}}, $message->{chat}->{id};
 	} elsif (defined $message->{left_chat_participant}
-			and $message->{left_chat_participant}->{id} eq $self->{myid}) {
+			&& $message->{left_chat_participant}->{id} eq $self->{myid}) {
 		my @groups = grep { $_ ne $message->{chat}->{id} } @{$self->{groups}};
 		$self->{groups} = \@groups;
 	}
