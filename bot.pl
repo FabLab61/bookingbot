@@ -13,7 +13,6 @@ use Mojolicious::Lite;
 use lib "lib/";
 
 use FSMFactory;
-use Google;
 use Groups;
 use Localization ();
 use Log;
@@ -32,8 +31,8 @@ my $fsmfactory = FSMFactory->new($api, $groups, $jsonconfig);
 
 my $log = Log->new();
 my %machines = ();
-
-Google::CalendarAPI::auth(dirname(__FILE__) . "/gapi.conf", "fablab61ru\@gmail.com");
+	
+#Google::CalendarAPI::auth(dirname(__FILE__) . "/gapi.conf", "fablab61ru\@gmail.com");
 
 
 $log->infof("ready to process incoming messages");
