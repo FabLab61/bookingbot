@@ -3,6 +3,13 @@ package FSMUtils;
 use strict;
 use warnings;
 use utf8;
+use Data::Dumper;
+
+=method  _with_text
+
+Perform a callback on message text
+
+=cut
 
 sub _with_text {
     my ( $update, $callback ) = @_;
@@ -13,8 +20,22 @@ sub _with_text {
       : undef;
 }
 
+
+=method _parse_value
+
+Perform a callback on message text
+
+$state = FSA::State object
+
+$parser =
+
+@data = previous sent data
+
+=cut
+
 sub _parse_value {
     my ( $state, $parser, @data ) = @_;
+    warn "".(caller(0))[3]."() : ".Dumper \@_;
 
     my $parsed = $parser->(@data);
     if ( defined $parsed ) {

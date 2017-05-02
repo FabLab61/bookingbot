@@ -6,6 +6,7 @@ use utf8;
 use overload;
 
 use Data::Dumper::AutoEncode;
+$Data::Dumper::Maxdepth = 2;
 use Data::Printer;
 use Log::Any ();
 use Log::Any::Adapter ('Stdout');

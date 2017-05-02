@@ -137,7 +137,7 @@ sub vacancies {
 		span => $_,
 		instructor => $self->_enclosing_event($events, $_)->{summary}
 	}} @$vacancies;
-	warn Dumper \@result;
+	warn "Vacancies: " .Dumper \@result;  #
 	return \@result;
 }
 

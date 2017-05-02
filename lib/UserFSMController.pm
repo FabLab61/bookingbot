@@ -3,6 +3,7 @@ package UserFSMController;
 use strict;
 use warnings;
 use utf8;
+use Data::Dumper;
 
 use FSMUtils;
 use Localization qw(lz dt);
@@ -106,6 +107,7 @@ sub resource_rule_resource_not_found {
 }
 
 sub resource_rule_duration {
+	warn "".(caller(0))[3]."() : ".Dumper \@_;
 	my ($self, $state, $update) = @_;
 	FSMUtils::_with_text($update, sub {
 		FSMUtils::_parse_value($state, sub {
@@ -220,7 +222,7 @@ sub do_datetime {
 
 sub datetime_rule_instructor {
 	my ($self, $state, $update) = @_;
-	FSMUtils::_with_text($update, sub {
+	FSMUtils::_with_text($update, sub {  # preform callback
 		FSMUtils::_parse_value($state, sub {
 			$self->{dtf}->parse(shift);
 		}, shift);
