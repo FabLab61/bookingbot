@@ -9,6 +9,8 @@ use Data::Dumper;
 
 Perform a callback on message text
 
+Performing on SCALAR
+
 =cut
 
 sub _with_text {
@@ -23,13 +25,11 @@ sub _with_text {
 
 =method _parse_value
 
-Perform a callback on message text
+Perform a callback on data. Depends on FSA::State object
 
-$state = FSA::State object
+@data = previous sent data in some cases (kind of serialization)
 
-$parser =
-
-@data = previous sent data
+Return https://metacpan.org/pod/FSA::Rules#result
 
 =cut
 

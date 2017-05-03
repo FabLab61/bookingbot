@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use utf8;
 use Data::Dumper;
+use Data::Printer;
 
 use FSMUtils;
 use Localization qw(lz dt);
@@ -259,9 +260,13 @@ sub instructor_rule_book {
 	my ($self, $state) = @_;
 
 	my $machine = $state->machine;
-	my $resource = $machine->last_result("RESOURCE");
-	my $datetime = $machine->last_result("DATETIME");
+	my $resource = $machine->last_result("RESOURCE"); # Scalar - resource name from json config
+	my $datetime = $machine->last_result("DATETIME"); #
 	my $duration = $machine->last_result("DURATION");
+
+	warn "RESOURCE: ".Dumper $resource;
+	warn "DATETIME: ".p ($datetime);  # wrong
+	warn "DURATION: ".Dumper $duration;
 
 	FSMUtils::_parse_value($state, sub {
 		my ($resource, $datetime, $duration) = @_;
